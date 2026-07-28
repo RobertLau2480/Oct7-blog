@@ -15,10 +15,10 @@ function getSlug() {
 }
 
 document.addEventListener("nav", function () {
+  collapseMobileExplorer(false)
   if (!document.getElementById("hamburger-menu")) rebuildUI()
   else { closeHamburger() }
-  var tbT = document.querySelector("#top-bar .top-bar-title")
-  if (tbT) tbT.textContent = document.title || "\u5F52\u9E1F\u7684\u9986\u85CF\u65E5\u5FD7"
+  updateTopBarTitle()
   restoreLock()
   var prev = sessionStorage.getItem('__prevPage')
   var cur = getSlug()
@@ -275,8 +275,55 @@ function closeHamburger() { var m = document.getElementById("hamburger-menu"); i
 // ====================================================================
 //  Init
 // ====================================================================
+// 移动端默认折叠 + 标题栏控制侧边栏
+function collapseMobileExplorer(updateTitle) {
+  if (window.innerWidth > 800) return
+  var exp = document.querySelector('.explorer')
+  if (exp && !exp.classList.contains('collapsed')) {
+    exp.classList.add('collapsed')
+    exp.setAttribute('aria-expanded', 'false')
+  }
+  if (updateTitle !== false) updateTopBarTitle()
+}
+
+// 切换侧边栏展开/折叠，并更新标题栏文字
+function toggleMobileExplorer() {
+  if (window.innerWidth > 800) return
+  var exp = document.querySelector('.explorer')
+  if (!exp) return
+  var isCollapsed = exp.classList.contains('collapsed')
+  if (isCollapsed) {
+    exp.classList.remove('collapsed')
+    exp.setAttribute('aria-expanded', 'true')
+  } else {
+    exp.classList.add('collapsed')
+    exp.setAttribute('aria-expanded', 'false')
+    document.documentElement.classList.remove('mobile-no-scroll')
+  }
+  updateTopBarTitle()
+}
+
+// 更新标题栏左侧文字：侧边栏展开时显示"✕ 关闭目录"
+function updateTopBarTitle() {
+  if (window.innerWidth > 800) return
+  var tbT = document.querySelector("#top-bar .top-bar-title")
+  if (!tbT) return
+  var exp = document.querySelector('.explorer')
+  if (!exp) return
+  if (!exp.classList.contains('collapsed')) {
+    tbT.innerHTML = '✕ 关闭目录'
+    tbT.style.cursor = 'pointer'
+    tbT.onclick = function(e) { e.stopPropagation(); toggleMobileExplorer() }
+  } else {
+    tbT.textContent = document.title || '安巢鸟的小站'
+    tbT.style.cursor = ''
+    tbT.onclick = null
+  }
+}
+
 function init() {
   rebuildUI()
+  collapseMobileExplorer()
   restoreFontSize()
   restoreBg()
   restoreFontColor()

@@ -458,8 +458,9 @@ var CrawlLinks = (userOpts) => {
                   }
                 }
                 if (opts.prettyLinks && isInternal && node.children.length === 1) {
+                  const hasAlias = classes.includes("alias");
                   const textChild = node.children[0];
-                  if (textChild?.type === "text" && !textChild.value.startsWith("#")) {
+                  if (textChild?.type === "text" && !textChild.value.startsWith("#") && !hasAlias) {
                     textChild.value = path.basename(textChild.value);
                   }
                 }

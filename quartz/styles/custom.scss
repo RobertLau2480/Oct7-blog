@@ -1151,3 +1151,49 @@ article img[src*="#right"] {
   margin-left: auto !important;
   margin-right: 0 !important;
 }
+
+/* ====== 移动端侧边栏修复 ====== */
+/* 只改 z-index/缩进，不干扰插件的显示/隐藏切换逻辑 */
+/* 默认折叠由 custom.js 中的 init() 通过添加 .collapsed 类控制 */
+@media (max-width: 800px) {
+  /* 层级：展开时侧边栏盖住顶部标题栏 */
+  .explorer .explorer-content {
+    z-index: 12020 !important;
+    padding: 44px 0 2rem 0 !important;
+  }
+  /* 文字缩进和左边距 - 增大左侧间距 */
+  .explorer .explorer-ul {
+    padding: 0 1rem 0 2.2rem !important;
+  }
+  .explorer-content ul li > a,
+  .explorer-content .folder-container div > button span,
+  .explorer-content .folder-container div > a {
+    padding-left: 0.8rem !important;
+    font-size: 0.95rem !important;
+  }
+  .folder-icon {
+    margin-right: 10px !important;
+  }
+  .folder-container {
+    padding-left: 0.8rem !important;
+  }
+  /* 移动端合并两层标题栏 - 隐藏默认的 quartz 桌面端标题栏 (在 sidebar.left 内) */
+  .sidebar.left .page-title,
+  .sidebar.left .page-header {
+    display: none !important;
+  }
+  /* 标题栏菜单按钮 - 移动端更窄 */
+  .top-bar-inner {
+    padding: 0 0.6rem !important;
+  }
+  #hamburger-menu {
+    width: calc(100vw - 0.6rem) !important;
+    max-width: 280px !important;
+  }
+  .hamburger-btn {
+    padding: 4px 5px !important;
+  }
+  .hamburger-line {
+    width: 17px !important;
+  }
+}

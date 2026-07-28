@@ -424,12 +424,12 @@ export function renderPage(
   function tp(f) { return bp + '/static/' + f; }
 
   var tracks = [
-    tp('05 Coffee Cats.m4a'), tp('1-28 希望的明\u2F47.m4a'),
-    tp('2-06 玉磬漻漻.m4a'), tp('2-16 风清月白.m4a'),
-    tp('26 Welcome School.m4a'), tp('ornave-lofi-moon-light-553399.mp3'),
-    tp('monume-lofi-chill-chill-509496.mp3'), tp('mao690276--527415.mp3'),
-    tp('lofidreams-cozy-lofi-background-music-for-study-457198.mp3'),
-    tp('apalonbeats-lofi-lofi-music-lofi-chill-2-560425.mp3')
+    tp('Coffee Cats.m4a'), tp('希望的明\u2F47.m4a'),
+    tp('玉磬漻漻.m4a'), tp('风清月白.m4a'),
+    tp('Welcome School.m4a'), tp('ornave-lofi-moon-light.mp3'),
+    tp('monume-lofi-chill-chill.mp3'), tp('mao690276.mp3'),
+    tp('lofidreams-cozy-lofi.mp3'),
+    tp('apalonbeats-lofi.mp3')
   ];
   var cur = 0;
   var audio = new Audio();

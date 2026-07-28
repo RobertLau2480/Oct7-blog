@@ -30,7 +30,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 
 // node_modules/extend/index.js
 var require_extend = __commonJS({
-  "node_modules/extend/index.js"(exports$1, module) {
+  "node_modules/extend/index.js"(exports, module) {
     var hasOwn = Object.prototype.hasOwnProperty;
     var toStr = Object.prototype.toString;
     var defineProperty = Object.defineProperty;
@@ -6112,6 +6112,18 @@ var BIGINT = 8;
 
 // node_modules/@ungap/structured-clone/esm/deserialize.js
 var env = typeof self === "object" ? self : globalThis;
+var guard = (name, init) => {
+  switch (name) {
+    case "Function":
+    case "SharedWorker":
+    case "Worker":
+    case "eval":
+    case "setInterval":
+    case "setTimeout":
+      throw new TypeError("unable to deserialize " + name);
+  }
+  return new env[name](init);
+};
 var deserializer = ($, _) => {
   const as = (out, index2) => {
     $.set(index2, out);
@@ -6157,7 +6169,10 @@ var deserializer = ($, _) => {
       }
       case ERROR: {
         const { name, message } = value;
-        return as(new env[name](message), index2);
+        return as(
+          typeof env[name] === "function" ? guard(name, message) : new Error(message),
+          index2
+        );
       }
       case BIGINT:
         return as(BigInt(value), index2);
@@ -6170,7 +6185,7 @@ var deserializer = ($, _) => {
         return as(new DataView(buffer), value);
       }
     }
-    return as(new env[type](value), index2);
+    return as(guard(type, value), index2);
   };
   return unpair;
 };
@@ -6203,8 +6218,8 @@ var typeOf = (value) => {
   }
   if (asString.includes("Array"))
     return [ARRAY, asString];
-  if (asString.includes("Error"))
-    return [ERROR, asString];
+  if (value instanceof Error)
+    return [ERROR, value.name || "Error"];
   return [OBJECT, asString];
 };
 var shouldSkip = ([TYPE, type]) => TYPE === PRIMITIVE && (type === "function" || type === "symbol");
@@ -6275,7 +6290,7 @@ var serializer = (strict, json, $, _) => {
         return index2;
       }
       case DATE:
-        return as([TYPE, value.toISOString()], value);
+        return as([TYPE, isNaN(value.getTime()) ? EMPTY : value.toISOString()], value);
       case REGEXP: {
         const { source, flags } = value;
         return as([TYPE, { source, flags }], value);
