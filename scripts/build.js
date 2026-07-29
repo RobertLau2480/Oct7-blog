@@ -126,4 +126,15 @@ if (fs.existsSync(imagesDir)) {
   console.log(`✅ 已复制 ${fs.readdirSync(imagesDir).length} 张图片`);
 }
 
+// ─── 复制 bgv 视频背景 ───
+const bgvDir = path.join(ROOT, 'static', 'bgv');
+if (fs.existsSync(bgvDir)) {
+  const targetBgvDir = path.join(PUBLIC, 'static', 'bgv');
+  fs.mkdirSync(targetBgvDir, { recursive: true });
+  for (const file of fs.readdirSync(bgvDir)) {
+    fs.copyFileSync(path.join(bgvDir, file), path.join(targetBgvDir, file));
+  }
+  console.log(`✅ 已复制 ${fs.readdirSync(bgvDir).length} 个背景视频/图片`);
+}
+
 console.log(`\n✨ 构建完成！${quotes.length} 条引言已注入，${Object.keys(files).length} 篇文章 + 首页`);

@@ -23,7 +23,6 @@ const quotesData = window.__QUOTES__ || [];
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 
-/* ─── 深浅色模式变量 ─── */
 :root {
   --sidebar-width: 280px;
   --bg: #f8f9fa;
@@ -42,32 +41,50 @@ const quotesData = window.__QUOTES__ || [];
   --overlay-bg: rgba(0,0,0,0.3);
   --blockquote-bg: #f8fbff;
   --img-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  --content-bg: rgba(248,249,250,0.88);
+  --sidebar-content-bg: rgba(255,255,255,0.93);
+  --header-content-bg: rgba(255,255,255,0.93);
+  --edge-blur-color: rgba(255,255,255,0.15);
 }
-[data-theme="dark"] {
-  --bg: #1a1a2e;
-  --sidebar-bg: #16213e;
-  --border: #2a2a4a;
-  --text: #e0e0e0;
-  --text-secondary: #a0a0b0;
-  --hover: #1a1a3e;
-  --active: #1a3a6e;
-  --accent: #64b5f6;
-  --code-bg: #1e1e3a;
-  --shadow: 0 2px 8px rgba(0,0,0,0.3);
-  --header-bg: #16213e;
-  --dropdown-bg: #16213e;
-  --dropdown-hover: #1a1a3e;
-  --overlay-bg: rgba(0,0,0,0.5);
-  --blockquote-bg: #1a1a3e;
-  --img-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
+/* 浅色主题色 */
+[data-bg="neutral"]{--bg:#f0f0f0;--content-bg:rgba(245,245,245,0.88);--sidebar-content-bg:rgba(250,250,250,0.93);--header-content-bg:rgba(250,250,250,0.93);--edge-blur-color:rgba(255,255,255,0.18)}
+[data-bg="warm"]{--bg:#faf5eb;--content-bg:rgba(253,247,237,0.88);--sidebar-content-bg:rgba(255,250,240,0.93);--header-content-bg:rgba(255,250,240,0.93);--edge-blur-color:rgba(255,250,240,0.18)}
+[data-bg="cool"]{--bg:#eef4fa;--content-bg:rgba(237,244,252,0.88);--sidebar-content-bg:rgba(242,248,255,0.93);--header-content-bg:rgba(242,248,255,0.93);--edge-blur-color:rgba(242,248,255,0.18)}
+/* 深色主题色 */
+[data-theme="dark"]{--bg:#1a1a2e;--sidebar-bg:#16213e;--border:#2a2a4a;--text:#e0e0e0;--text-secondary:#a0a0b0;--hover:#1a1a3e;--active:#1a3a6e;--accent:#64b5f6;--code-bg:#1e1e3a;--shadow:0 2px 8px rgba(0,0,0,0.3);--header-bg:#16213e;--dropdown-bg:#16213e;--dropdown-hover:#1a1a3e;--overlay-bg:rgba(0,0,0,0.5);--blockquote-bg:#1a1a3e;--img-shadow:0 2px 8px rgba(0,0,0,0.3);--content-bg:rgba(26,26,46,0.88);--sidebar-content-bg:rgba(22,33,62,0.93);--header-content-bg:rgba(22,33,62,0.93);--edge-blur-color:rgba(0,0,0,0.12)}
+[data-theme="dark"][data-bg="neutral"]{--content-bg:rgba(30,30,40,0.88);--sidebar-content-bg:rgba(35,35,50,0.93);--header-content-bg:rgba(35,35,50,0.93);--bg:#1e1e28;--sidebar-bg:#232332;--edge-blur-color:rgba(0,0,0,0.14)}
+[data-theme="dark"][data-bg="warm"]{--content-bg:rgba(40,35,28,0.88);--sidebar-content-bg:rgba(50,42,30,0.93);--header-content-bg:rgba(50,42,30,0.93);--bg:#282318;--sidebar-bg:#322a1e;--edge-blur-color:rgba(0,0,0,0.14)}
+[data-theme="dark"][data-bg="cool"]{--content-bg:rgba(26,30,42,0.88);--sidebar-content-bg:rgba(30,38,55,0.93);--header-content-bg:rgba(30,38,55,0.93);--bg:#1a1e2a;--sidebar-bg:#1e2637;--edge-blur-color:rgba(0,0,0,0.14)}
 
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;overflow:hidden}
-.sidebar{width:var(--sidebar-width);min-width:var(--sidebar-width);height:100vh;background:var(--sidebar-bg);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:100}
+/* ===== 背景层 ===== */
+/* 底层：视频/图片 */
+.bg-layer{position:fixed;inset:0;z-index:-3;overflow:hidden;background:var(--bg)}
+.bg-video{position:absolute;width:100%;height:100%;object-fit:cover}
+.bg-image{position:absolute;width:100%;height:100%;object-fit:cover}
+/* 中层：全屏模糊遮罩（覆盖整个背景） */
+.bg-blur-overlay{position:fixed;inset:0;z-index:-2;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+/* 上层：两侧边缘更浅模糊（覆盖正文左右空白） */
+.bg-edge-left,.bg-edge-right{position:fixed;top:0;bottom:0;z-index:-1;pointer-events:none}
+.bg-edge-left{left:0;width:calc((100% - 860px - var(--sidebar-width)) / 2 + var(--sidebar-width));backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);background:var(--edge-blur-color)}
+.bg-edge-right{right:0;width:calc((100% - 860px) / 2);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);background:var(--edge-blur-color)}
+/* 移动端边缘覆盖调整 */
+@media(max-width:768px){
+  .bg-edge-left{left:0;width:50%}
+  .bg-edge-right{right:0;width:50%}
+}
+/* 内容层半透明 */
+.sidebar,.main-header,.content-wrapper,.menu-dropdown{background:var(--content-bg)}
+.sidebar{background:var(--sidebar-content-bg)}
+.main-header{background:var(--header-content-bg)}
+.menu-dropdown{background:var(--sidebar-content-bg)}
+.search-box{background:var(--content-bg)}
+
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif;color:var(--text);height:100vh;display:flex;overflow:hidden;position:relative}
+.sidebar{width:var(--sidebar-width);min-width:var(--sidebar-width);height:100vh;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:10}
 .sidebar-header{padding:20px;border-bottom:1px solid var(--border)}
 .sidebar-header h1{font-size:20px;font-weight:700;color:var(--accent)}
 .sidebar-header p{font-size:12px;color:var(--text-secondary);margin-top:4px}
-.search-box{margin:12px 16px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;outline:none;transition:border-color .2s;background:var(--bg);color:var(--text)}
+.search-box{margin:12px 16px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;outline:none;transition:border-color .2s;color:var(--text)}
 .search-box:focus{border-color:var(--accent)}
 .search-box::placeholder{color:var(--text-secondary)}
 .tree-wrapper{flex:1;overflow-y:auto;padding:8px 0}
@@ -83,18 +100,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 .tree-children{display:none}
 .tree-children.open{display:block}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-/* 标题栏 */
-.main-header{display:flex;align-items:center;padding:8px 20px;background:var(--header-bg);border-bottom:1px solid var(--border);gap:8px;min-height:52px}
+.main-header{display:flex;align-items:center;padding:8px 20px;border-bottom:1px solid var(--border);gap:8px;min-height:52px}
 .hamburger{display:none;background:none;border:none;font-size:20px;cursor:pointer;padding:4px 8px;color:var(--text);border-radius:4px}
 .hamburger:hover{background:var(--hover)}
 .desktop-title{font-size:16px;font-weight:600;color:var(--accent);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .header-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .header-btn{background:none;border:1px solid var(--border);font-size:18px;cursor:pointer;padding:6px 10px;color:var(--text);border-radius:6px;transition:all .2s;line-height:1;display:flex;align-items:center;justify-content:center}
 .header-btn:hover{background:var(--hover);border-color:var(--accent)}
-/* 下拉菜单 */
-.menu-dropdown{position:fixed;right:20px;top:52px;background:var(--dropdown-bg);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);padding:8px 0;min-width:160px;z-index:200;display:none}
+.menu-dropdown{position:fixed;right:20px;top:52px;border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);padding:8px 0;min-width:200px;z-index:200;display:none}
 .menu-dropdown.open{display:block}
-.menu-dropdown-item{padding:10px 20px;font-size:14px;color:var(--text);cursor:pointer;transition:background .15s;white-space:nowrap}
+.menu-section{padding:6px 16px 4px;font-size:11px;font-weight:600;color:var(--text-secondary);letter-spacing:1px;text-transform:uppercase}
+.menu-dropdown-item{padding:8px 20px;font-size:14px;color:var(--text);cursor:pointer;transition:background .15s;white-space:nowrap;display:flex;align-items:center;gap:8px}
 .menu-dropdown-item:hover{background:var(--dropdown-hover)}
 .content-wrapper{flex:1;overflow-y:auto;padding:40px;max-width:860px;width:100%;margin:0 auto}
 .content-wrapper::-webkit-scrollbar{width:8px}
@@ -139,6 +155,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 </style>
 </head>
 <body>
+<!-- 背景层 -->
+<div class="bg-layer" id="bgLayer">
+  <video class="bg-video" id="bgVideo" muted loop playsinline preload="auto"></video>
+  <img class="bg-image" id="bgImage" alt="" style="display:none">
+</div>
+<!-- 全屏模糊遮罩（覆盖全部背景） -->
+<div class="bg-blur-overlay"></div>
+<!-- 两侧边缘更浅模糊 -->
+<div class="bg-edge-left"></div>
+<div class="bg-edge-right"></div>
+
 <div class="overlay" id="overlay"></div>
 
 <nav class="sidebar" id="sidebar">
@@ -161,7 +188,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
     </div>
   </div>
   <div class="menu-dropdown" id="menuDropdown">
-    <div class="menu-dropdown-item">🔧 功能开发中...</div>
+    <div class="menu-section">背景切换</div>
+    <div class="menu-dropdown-item" data-bg-option="video">🎬 视频背景</div>
+    <div class="menu-dropdown-item" data-bg-option="neutral">⬜ 中性</div>
+    <div class="menu-dropdown-item" data-bg-option="warm">🟨 暖色</div>
+    <div class="menu-dropdown-item" data-bg-option="cool">🟦 冷色</div>
   </div>
   <div class="content-wrapper" id="contentWrapper">
     <div class="empty-state" id="emptyState">
@@ -197,14 +228,87 @@ function toggleTheme() {
     localStorage.setItem('theme', 'dark');
     document.getElementById('themeToggle').textContent = '☀️';
   }
+  updateBackground();
 }
 document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 
-// 初始化按钮图标
 (function() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
 })();
+
+// ─── 背景切换 ───
+function getBgOption() {
+  return localStorage.getItem('bgOption') || 'video';
+}
+
+function setBgOption(opt) {
+  localStorage.setItem('bgOption', opt);
+  document.documentElement.setAttribute('data-bg', opt === 'video' ? '' : opt);
+  document.querySelectorAll('[data-bg-option]').forEach(el => {
+    el.style.fontWeight = el.dataset.bgOption === opt ? '600' : '';
+    el.style.color = el.dataset.bgOption === opt ? 'var(--accent)' : '';
+  });
+  updateBackground();
+}
+
+function updateBackground() {
+  const opt = getBgOption();
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const isMobile = window.innerWidth <= 768;
+  const videoEl = document.getElementById('bgVideo');
+  const imgEl = document.getElementById('bgImage');
+
+  if (opt === 'video') {
+    var videoSrc = '';
+    var imgSrc = '';
+    if (isMobile) {
+      imgSrc = isDark ? 'static/bgv/dark_bg.jpg' : 'static/bgv/light_bg.jpg';
+    } else {
+      videoSrc = isDark ? 'static/bgv/dark_bg.mp4' : 'static/bgv/light_bg.mp4';
+      imgSrc = isDark ? 'static/bgv/dark_bg.jpg' : 'static/bgv/light_bg.jpg';
+    }
+    imgEl.src = imgSrc;
+    imgEl.style.display = 'block';
+    if (videoSrc) {
+      videoEl.src = videoSrc;
+      videoEl.style.display = 'block';
+      videoEl.play().catch(function(){});
+    } else {
+      videoEl.style.display = 'none';
+    }
+  } else {
+    videoEl.style.display = 'none';
+    imgEl.style.display = 'none';
+  }
+}
+
+// 初始化背景
+(function() {
+  const savedBg = localStorage.getItem('bgOption');
+  if (savedBg && savedBg !== 'video') {
+    document.documentElement.setAttribute('data-bg', savedBg);
+    document.querySelectorAll('[data-bg-option]').forEach(el => {
+      if (el.dataset.bgOption === savedBg) {
+        el.style.fontWeight = '600';
+        el.style.color = 'var(--accent)';
+      }
+    });
+  }
+  updateBackground();
+})();
+
+document.querySelectorAll('[data-bg-option]').forEach(el => {
+  el.addEventListener('click', function(e) {
+    e.stopPropagation();
+    setBgOption(this.dataset.bgOption);
+    document.getElementById('menuDropdown').classList.remove('open');
+  });
+});
+
+window.addEventListener('resize', function() {
+  if (getBgOption() === 'video') updateBackground();
+});
 
 // ─── 菜单下拉 ───
 document.getElementById('menuBtn').addEventListener('click', function(e) {
@@ -352,14 +456,12 @@ function loadFile(path, element) {
     imgs[i].addEventListener('click', function() { window.open(this.src, '_blank'); });
   }
 
-  // 替换首页中的「 正在加载... 」为随机引言
   if (quotesData.length > 0) {
     var quoteEl = mdBody.querySelector('.random-quote');
     if (quoteEl && quoteEl.textContent.indexOf('正在加载') !== -1) {
       var idx = Math.floor(Math.random() * quotesData.length);
       var q = quotesData[idx];
       quoteEl.textContent = '「 ' + q.text + ' 」';
-      // 尝试找到引用来源元素（在 index.md 中可能没有来源元素，有则更好）
     }
   }
 
