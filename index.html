@@ -10,12 +10,14 @@
 <script>window.__TREE__ = {"tree":[]};</script>
 <script>window.__FILES__ = {};</script>
 <script>window.__ARTICLE_PATH__ = "";</script>
+<script>window.__QUOTES__ = [];</script>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
 const treeData = window.__TREE__ ? window.__TREE__.tree : [];
 const contentMap = window.__FILES__ || {};
 const articlePath = window.__ARTICLE_PATH__ || "";
+const quotesData = window.__QUOTES__ || [];
 </script>
 
 <style>
@@ -348,6 +350,17 @@ function loadFile(path, element) {
   for (var i = 0; i < imgs.length; i++) {
     imgs[i].style.cursor = 'zoom-in';
     imgs[i].addEventListener('click', function() { window.open(this.src, '_blank'); });
+  }
+
+  // 替换首页中的「 正在加载... 」为随机引言
+  if (quotesData.length > 0) {
+    var quoteEl = mdBody.querySelector('.random-quote');
+    if (quoteEl && quoteEl.textContent.indexOf('正在加载') !== -1) {
+      var idx = Math.floor(Math.random() * quotesData.length);
+      var q = quotesData[idx];
+      quoteEl.textContent = '「 ' + q.text + ' 」';
+      // 尝试找到引用来源元素（在 index.md 中可能没有来源元素，有则更好）
+    }
   }
 
   var label = element ? element.querySelector('span:last-child').textContent : '';
