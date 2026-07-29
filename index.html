@@ -6,11 +6,9 @@
 <title>个人博客</title>
 </head>
 <body>
-<!-- 构建注入：目录树 -->
+<!-- 构建注入 -->
 <script>window.__TREE__ = {"tree":[]};</script>
-<!-- 构建注入：全部文章内容 -->
 <script>window.__FILES__ = {};</script>
-<!-- 构建注入：当前文章路径（/ 时留空） -->
 <script>window.__ARTICLE_PATH__ = "";</script>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -18,43 +16,61 @@
 const treeData = window.__TREE__ ? window.__TREE__.tree : [];
 const contentMap = window.__FILES__ || {};
 const articlePath = window.__ARTICLE_PATH__ || "";
-
-function initApp() {
-  if (treeData.length === 0) {
-    document.getElementById('treeWrapper').innerHTML = '<p style="padding:20px;color:#d32f2f;">❌ 请先运行 node scripts/build.js 构建</p>';
-    return;
-  }
-  renderTree(treeData, document.getElementById('treeWrapper'));
-
-  // 如果有默认文章路径，加载它；否则加载首页
-  if (articlePath && contentMap[articlePath]) {
-    const el = document.querySelector(`[data-path="${articlePath}"]`);
-    loadFile(articlePath, el || null);
-  } else {
-    const first = findFirstFile(treeData);
-    if (first && contentMap[first.path]) {
-      setTimeout(() => {
-        const el = document.querySelector(`[data-path="${first.path}"]`);
-        if (el) el.click();
-      }, 100);
-    }
-  }
-}
 </script>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--sidebar-width:280px;--bg:#f8f9fa;--sidebar-bg:#fff;--border:#e0e0e0;--text:#333;--text-secondary:#666;--hover:#f0f0f0;--active:#e3f2fd;--accent:#1976d2;--code-bg:#f5f5f5;--shadow:0 2px 8px rgba(0,0,0,.08)}
+
+/* ─── 深浅色模式变量 ─── */
+:root {
+  --sidebar-width: 280px;
+  --bg: #f8f9fa;
+  --sidebar-bg: #ffffff;
+  --border: #e0e0e0;
+  --text: #333333;
+  --text-secondary: #666666;
+  --hover: #f0f0f0;
+  --active: #e3f2fd;
+  --accent: #1976d2;
+  --code-bg: #f5f5f5;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  --header-bg: #ffffff;
+  --dropdown-bg: #ffffff;
+  --dropdown-hover: #f0f0f0;
+  --overlay-bg: rgba(0,0,0,0.3);
+  --blockquote-bg: #f8fbff;
+  --img-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+[data-theme="dark"] {
+  --bg: #1a1a2e;
+  --sidebar-bg: #16213e;
+  --border: #2a2a4a;
+  --text: #e0e0e0;
+  --text-secondary: #a0a0b0;
+  --hover: #1a1a3e;
+  --active: #1a3a6e;
+  --accent: #64b5f6;
+  --code-bg: #1e1e3a;
+  --shadow: 0 2px 8px rgba(0,0,0,0.3);
+  --header-bg: #16213e;
+  --dropdown-bg: #16213e;
+  --dropdown-hover: #1a1a3e;
+  --overlay-bg: rgba(0,0,0,0.5);
+  --blockquote-bg: #1a1a3e;
+  --img-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;overflow:hidden}
-.sidebar{width:var(--sidebar-width);min-width:var(--sidebar-width);height:100vh;background:var(--sidebar-bg);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:transform .3s ease;z-index:100}
+.sidebar{width:var(--sidebar-width);min-width:var(--sidebar-width);height:100vh;background:var(--sidebar-bg);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:100}
 .sidebar-header{padding:20px;border-bottom:1px solid var(--border)}
 .sidebar-header h1{font-size:20px;font-weight:700;color:var(--accent)}
 .sidebar-header p{font-size:12px;color:var(--text-secondary);margin-top:4px}
-.search-box{margin:12px 16px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;outline:none;transition:border-color .2s}
+.search-box{margin:12px 16px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;outline:none;transition:border-color .2s;background:var(--bg);color:var(--text)}
 .search-box:focus{border-color:var(--accent)}
+.search-box::placeholder{color:var(--text-secondary)}
 .tree-wrapper{flex:1;overflow-y:auto;padding:8px 0}
 .tree-wrapper::-webkit-scrollbar{width:6px}
-.tree-wrapper::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
+.tree-wrapper::-webkit-scrollbar-thumb{background:var(--text-secondary);border-radius:3px}
 .tree-item{cursor:pointer;user-select:none}
 .tree-item-inner{display:flex;align-items:center;gap:6px;padding:6px 16px;font-size:14px;color:var(--text);transition:background .15s}
 .tree-item-inner:hover{background:var(--hover)}
@@ -65,12 +81,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 .tree-children{display:none}
 .tree-children.open{display:block}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.main-header{display:none;align-items:center;padding:12px 16px;background:var(--sidebar-bg);border-bottom:1px solid var(--border);gap:12px}
-.hamburger{background:none;border:none;font-size:20px;cursor:pointer;padding:4px 8px;color:var(--text);border-radius:4px}
+/* 标题栏 */
+.main-header{display:flex;align-items:center;padding:8px 20px;background:var(--header-bg);border-bottom:1px solid var(--border);gap:8px;min-height:52px}
+.hamburger{display:none;background:none;border:none;font-size:20px;cursor:pointer;padding:4px 8px;color:var(--text);border-radius:4px}
 .hamburger:hover{background:var(--hover)}
+.desktop-title{font-size:16px;font-weight:600;color:var(--accent);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.header-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.header-btn{background:none;border:1px solid var(--border);font-size:18px;cursor:pointer;padding:6px 10px;color:var(--text);border-radius:6px;transition:all .2s;line-height:1;display:flex;align-items:center;justify-content:center}
+.header-btn:hover{background:var(--hover);border-color:var(--accent)}
+/* 下拉菜单 */
+.menu-dropdown{position:fixed;right:20px;top:52px;background:var(--dropdown-bg);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);padding:8px 0;min-width:160px;z-index:200;display:none}
+.menu-dropdown.open{display:block}
+.menu-dropdown-item{padding:10px 20px;font-size:14px;color:var(--text);cursor:pointer;transition:background .15s;white-space:nowrap}
+.menu-dropdown-item:hover{background:var(--dropdown-hover)}
 .content-wrapper{flex:1;overflow-y:auto;padding:40px;max-width:860px;width:100%;margin:0 auto}
 .content-wrapper::-webkit-scrollbar{width:8px}
-.content-wrapper::-webkit-scrollbar-thumb{background:#ccc;border-radius:4px}
+.content-wrapper::-webkit-scrollbar-thumb{background:var(--text-secondary);border-radius:4px}
 .markdown-body{line-height:1.8;font-size:16px;color:var(--text)}
 .markdown-body h1{font-size:28px;font-weight:700;margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid var(--border)}
 .markdown-body h2{font-size:22px;font-weight:600;margin:28px 0 12px}
@@ -78,11 +104,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 .markdown-body p{margin:12px 0}
 .markdown-body ul,.markdown-body ol{margin:8px 0;padding-left:24px}
 .markdown-body li{margin:4px 0}
-.markdown-body code{background:var(--code-bg);padding:2px 6px;border-radius:4px;font-size:14px;font-family:"Fira Code","Consolas",monospace}
+.markdown-body code{background:var(--code-bg);padding:2px 6px;border-radius:4px;font-size:14px;font-family:"Fira Code","Consolas",monospace;color:var(--text)}
 .markdown-body pre{background:var(--code-bg);padding:16px;border-radius:8px;overflow-x:auto;margin:16px 0}
 .markdown-body pre code{background:none;padding:0;font-size:14px}
-.markdown-body blockquote{border-left:4px solid var(--accent);padding:8px 16px;margin:16px 0;background:#f8fbff;color:var(--text-secondary)}
-.markdown-body img{max-width:100%;border-radius:8px;margin:16px 0;box-shadow:var(--shadow)}
+.markdown-body blockquote{border-left:4px solid var(--accent);padding:8px 16px;margin:16px 0;background:var(--blockquote-bg);color:var(--text-secondary)}
+.markdown-body img{max-width:100%;border-radius:8px;margin:16px 0;box-shadow:var(--img-shadow)}
 .markdown-body a{color:var(--accent);text-decoration:none}
 .markdown-body a:hover{text-decoration:underline}
 .markdown-body hr{border:none;border-top:1px solid var(--border);margin:24px 0}
@@ -90,20 +116,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 .markdown-body th,.markdown-body td{border:1px solid var(--border);padding:8px 12px;text-align:left}
 .markdown-body th{background:var(--hover);font-weight:600}
 .markdown-body strong{font-weight:700}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:99}
+.overlay{display:none;position:fixed;inset:0;background:var(--overlay-bg);z-index:99}
 .overlay.show{display:block}
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-secondary)}
 .empty-state h2{font-size:24px;margin-bottom:8px}
 .empty-state p{font-size:14px}
 @media(max-width:768px){
-.sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);box-shadow:var(--shadow)}
+.hamburger{display:block}
+.main-header{padding:8px 12px}
+.sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);box-shadow:var(--shadow);transition:transform .3s ease}
 .sidebar.open{transform:translateX(0)}
-.main-header{display:flex}
 .content-wrapper{padding:20px 16px}
 .markdown-body{font-size:15px}
 .markdown-body h1{font-size:22px}
 .markdown-body h2{font-size:18px}
 .markdown-body h3{font-size:16px}
+.desktop-title{display:none}
+.menu-dropdown{right:12px}
 }
 </style>
 </head>
@@ -122,7 +151,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 <div class="main">
   <div class="main-header">
     <button class="hamburger" id="hamburgerBtn">☰</button>
-    <span id="mobileTitle" style="font-size:15px;font-weight:600;color:var(--text);">个人博客</span>
+    <span class="desktop-title" id="desktopTitle">📝 个人博客</span>
+    <span id="mobileTitle" style="font-size:15px;font-weight:600;color:var(--text);display:none;">个人博客</span>
+    <div class="header-actions">
+      <button class="header-btn" id="themeToggle" title="切换深浅色模式">🌙</button>
+      <button class="header-btn" id="menuBtn" title="菜单">☰</button>
+    </div>
+  </div>
+  <div class="menu-dropdown" id="menuDropdown">
+    <div class="menu-dropdown-item">🔧 功能开发中...</div>
   </div>
   <div class="content-wrapper" id="contentWrapper">
     <div class="empty-state" id="emptyState">
@@ -134,7 +171,96 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 </div>
 
 <script>
+// ─── 深浅色模式 ───
+(function() {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  } else if (saved === 'light') {
+    document.documentElement.removeAttribute('data-theme');
+  } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+})();
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  if (isDark) {
+    html.removeAttribute('data-theme');
+    localStorage.setItem('theme', 'light');
+    document.getElementById('themeToggle').textContent = '🌙';
+  } else {
+    html.setAttribute('data-theme', 'dark');
+    localStorage.setItem('theme', 'dark');
+    document.getElementById('themeToggle').textContent = '☀️';
+  }
+}
+document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+// 初始化按钮图标
+(function() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+})();
+
+// ─── 菜单下拉 ───
+document.getElementById('menuBtn').addEventListener('click', function(e) {
+  e.stopPropagation();
+  document.getElementById('menuDropdown').classList.toggle('open');
+});
+document.addEventListener('click', function() {
+  document.getElementById('menuDropdown').classList.remove('open');
+});
+document.getElementById('menuDropdown').addEventListener('click', function(e) {
+  e.stopPropagation();
+});
+
+// ─── 应用初始化 ───
 initApp();
+
+function initApp() {
+  if (treeData.length === 0) {
+    document.getElementById('treeWrapper').innerHTML = '<p style="padding:20px;color:#d32f2f;">❌ 请先运行 node scripts/build.js 构建</p>';
+    return;
+  }
+  renderTree(treeData, document.getElementById('treeWrapper'));
+
+  if (articlePath && contentMap[articlePath]) {
+    expandToPath(articlePath);
+    const el = document.querySelector(`[data-path="${articlePath}"]`);
+    loadFile(articlePath, el || null);
+  } else {
+    const first = findFirstFile(treeData);
+    if (first && contentMap[first.path]) {
+      setTimeout(() => {
+        const el = document.querySelector(`[data-path="${first.path}"]`);
+        if (el) el.click();
+      }, 100);
+    }
+  }
+}
+
+function expandToPath(filePath) {
+  const parts = filePath.split('/');
+  const dirParts = parts.slice(0, -1);
+  var items = document.querySelectorAll('.tree-item');
+  for (var i = 0; i < items.length; i++) {
+    var inner = items[i].querySelector('.tree-item-inner');
+    if (!inner) continue;
+    var arrow = inner.querySelector('.tree-arrow');
+    if (!arrow) continue;
+    var folderName = inner.querySelector('span:last-child').textContent;
+    for (var j = 1; j < dirParts.length; j++) {
+      if (dirParts[j] === folderName) {
+        arrow.classList.add('open');
+        var ch = items[i].querySelector('.tree-children');
+        if (ch) ch.classList.add('open');
+        break;
+      }
+    }
+  }
+}
 
 function renderTree(nodes, container, depth) {
   if (depth === undefined) depth = 0;
@@ -167,10 +293,8 @@ function renderTree(nodes, container, depth) {
       inner.style.paddingLeft = (16 + depth * 16) + 'px';
       inner.innerHTML = '<span class="tree-icon">' + getIcon(node.path) + '</span><span>' + esc(label) + '</span>';
       inner.dataset.path = node.path;
-      // 使用 a 链接跳转到独立文章页，保留侧栏导航
       inner.addEventListener('click', function() {
-        const url = getArticleUrl(node.path);
-        window.location.href = url;
+        window.location.href = getArticleUrl(node.path);
       });
       item.appendChild(inner);
     }
@@ -178,10 +302,7 @@ function renderTree(nodes, container, depth) {
   }
 }
 
-// 文章路径 → URL 映射规则
 function getArticleUrl(filePath) {
-  // content/xxx.md → /xxx.html
-  // content/xxx/index.md → /xxx/index.html
   let url = filePath
     .replace(/^content\//, '')
     .replace(/\/index\.md$/, '/index.html')
@@ -230,6 +351,7 @@ function loadFile(path, element) {
   }
 
   var label = element ? element.querySelector('span:last-child').textContent : '';
+  document.getElementById('desktopTitle').textContent = '📝 ' + (label || '个人博客');
   document.getElementById('mobileTitle').textContent = label || '个人博客';
   closeSidebar();
 }
