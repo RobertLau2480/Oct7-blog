@@ -1,0 +1,94 @@
+{
+  "tree": [
+    {
+      "name": "index.md",
+      "type": "file",
+      "path": "content/index.md",
+      "label": "index"
+    },
+    {
+      "name": "个人博客.md",
+      "type": "file",
+      "path": "content/个人博客.md",
+      "label": "个人博客"
+    },
+    {
+      "name": "关于.md",
+      "type": "file",
+      "path": "content/关于.md",
+      "label": "关于"
+    },
+    {
+      "name": "杂谈",
+      "type": "folder",
+      "children": [
+        {
+          "name": "01 网名的故事.md",
+          "type": "file",
+          "path": "content/杂谈/01 网名的故事.md",
+          "label": "01 网名的故事"
+        },
+        {
+          "name": "index.md",
+          "type": "file",
+          "path": "content/杂谈/index.md",
+          "label": "index"
+        }
+      ]
+    },
+    {
+      "name": "留言.md",
+      "type": "file",
+      "path": "content/留言.md",
+      "label": "留言"
+    },
+    {
+      "name": "计算机入门指南",
+      "type": "folder",
+      "children": [
+        {
+          "name": "index.md",
+          "type": "file",
+          "path": "content/计算机入门指南/index.md",
+          "label": "index"
+        },
+        {
+          "name": "基础入门",
+          "type": "folder",
+          "children": [
+            {
+              "name": "01 认识你的电脑.md",
+              "type": "file",
+              "path": "content/计算机入门指南/基础入门/01 认识你的电脑.md",
+              "label": "01 认识你的电脑"
+            },
+            {
+              "name": "index.md",
+              "type": "file",
+              "path": "content/计算机入门指南/基础入门/index.md",
+              "label": "index"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "随笔",
+      "type": "folder",
+      "children": [
+        {
+          "name": "01.md",
+          "type": "file",
+          "path": "content/随笔/01.md",
+          "label": "01"
+        },
+        {
+          "name": "index.md",
+          "type": "file",
+          "path": "content/随笔/index.md",
+          "label": "index"
+        }
+      ]
+    }
+  ]
+}

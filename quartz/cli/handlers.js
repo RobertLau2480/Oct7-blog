@@ -585,6 +585,24 @@ export async function handleBuild(argv) {
     ctx.dispose()
   }
 
+  // ── 自定义：构建完成后，将我们的博客 index.html 注入到 output 目录 ──
+  if (!argv.watch && !argv.serve) {
+    const { execSync } = await import("child_process")
+    try {
+      execSync("node " + JSON.stringify(path.join(cwd, "scripts", "build.js")), {
+        stdio: "pipe",
+        cwd,
+        encoding: "utf-8",
+      })
+      const src = path.join(cwd, "index.html")
+      const dest = path.join(path.resolve(argv.output || "public"), "index.html")
+      await fs.promises.copyFile(src, dest)
+      console.log(`\n✅ 博客 index.html 已注入 ${dest}`)
+    } catch (err) {
+      console.error("⚠️  博客注入失败（build.js 未找到或无 content 目录）:", err.message)
+    }
+  }
+
   if (argv.watch) {
     const paths = await globby([
       "**/*.ts",
