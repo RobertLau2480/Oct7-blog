@@ -1,13 +1,11 @@
----
-title: 安巢鸟的小站
-lang: zh-CN
-comments: false
----
+
 
 <div class="home-wrapper">
 <header class="home-header">
-<h1 class="site-title">安巢鸟的个人网站</h1>
-<p class="random-quote" id="random-quote">「 正在加载... 」</p>
+<h1 class="site-title">安巢鸟的个人网站 <span style="font-size: 1.1rem"> HomewardBird's Site</span></h1>
+
+<i><p class="random-quote" id="random-quote">「 正在加载... 」</p></i>
+<span style="font-size: 0.1rem"><br></span>
 </header>
 
 <section class="author-words">

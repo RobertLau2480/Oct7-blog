@@ -35,12 +35,15 @@ function scan(dirPath, relPath = '') {
       }
     } else if (item.name.endsWith('.md')) {
       const fileKey = `content/${itemRel}`;
-      tree.push({
-        name: item.name,
-        type: 'file',
-        path: fileKey,
-        label: item.name.replace(/\.md$/, '')
-      });
+      // 不把 index.md 作为单独文件条目加入 tree（由文件夹代表）
+      if (item.name !== 'index.md') {
+        tree.push({
+          name: item.name,
+          type: 'file',
+          path: fileKey,
+          label: item.name.replace(/\.md$/, '')
+        });
+      }
       files[fileKey] = fs.readFileSync(fullPath, 'utf-8');
     }
   }
@@ -131,6 +134,20 @@ if (fs.existsSync(imagesDir)) {
     fs.copyFileSync(path.join(imagesDir, file), path.join(targetImgDir, file));
   }
   console.log(`✅ 已复制 ${fs.readdirSync(imagesDir).length} 张图片`);
+}
+
+// ─── 复制 sw.js ───
+const swPath = path.join(ROOT, 'sw.js');
+if (fs.existsSync(swPath)) {
+  fs.copyFileSync(swPath, path.join(PUBLIC, 'sw.js'));
+  console.log('✅ 已复制 Service Worker sw.js');
+}
+
+// ─── 复制 404 ───
+const h404Path = path.join(ROOT, '404.html');
+if (fs.existsSync(h404Path)) {
+  fs.copyFileSync(h404Path, path.join(PUBLIC, '404.html'));
+  console.log('✅ 已复制 404.html');
 }
 
 // ─── 复制 icon ───
