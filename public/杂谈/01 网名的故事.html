@@ -373,6 +373,14 @@ function navigateTo(url) {
   // 加载文章
   loadFile(fileKey, el);
 
+  // 刷新 Giscus 评论（按当前 URL 路径加载对应讨论）
+  var gFrame = document.querySelector('iframe.giscus-frame');
+  if (gFrame) {
+    gFrame.contentWindow.postMessage({
+      giscus: { setConfig: { term: window.location.pathname } }
+    }, 'https://giscus.app');
+  }
+
   // 更新标题
   var label = '安巢鸟的小站';
   if (fileKey !== 'content/index.md') {
@@ -432,19 +440,21 @@ function expandToPath(filePath) {
   });
 }
 
-function renderTree(nodes,container,depth){
+function renderTree(nodes,container,depth,parentPath){
   if(depth===undefined)depth=0;
+  if(parentPath===undefined)parentPath='';
   nodes.forEach(function(node){
     if(node.type==='folder'&&node.name==='images')return;
     var item=document.createElement('div');item.className='tree-item';
     if(node.type==='folder'){
+      var folderPath=parentPath+'/'+encodeURIComponent(node.name);
       var inner=document.createElement('div');inner.className='tree-item-inner tree-item-inner-folder';inner.style.paddingLeft=(16+depth*16)+'px';
       inner.innerHTML='<span class="tree-arrow">▶</span><span class="tree-icon">📁</span><span>'+esc(node.name)+'</span>';
       var arrow=inner.querySelector('.tree-arrow');
       arrow.addEventListener('click',function(e){e.stopPropagation();this.classList.toggle('open');item.querySelector('.tree-children').classList.toggle('open')});
-      inner.addEventListener('click',function(e){e.stopPropagation();navigateTo('/'+encodeURIComponent(node.name)+'/')});
+      inner.addEventListener('click',function(e){e.stopPropagation();navigateTo(folderPath+'/')});
       item.appendChild(inner);
-      var ch=document.createElement('div');ch.className='tree-children';renderTree(node.children||[],ch,depth+1);item.appendChild(ch);
+      var ch=document.createElement('div');ch.className='tree-children';renderTree(node.children||[],ch,depth+1,folderPath);item.appendChild(ch);
     } else {
       var inner=document.createElement('div');inner.className='tree-item-inner';
       var label=node.label==='index'?(node.path.split('/').slice(-2,-1)[0]||'首页'):node.label;
