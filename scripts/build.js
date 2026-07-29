@@ -133,6 +133,15 @@ if (fs.existsSync(imagesDir)) {
   console.log(`✅ 已复制 ${fs.readdirSync(imagesDir).length} 张图片`);
 }
 
+// ─── 复制 icon ───
+const iconPath = path.join(ROOT, 'static', 'icon.png');
+if (fs.existsSync(iconPath)) {
+  const targetStatic = path.join(PUBLIC, 'static');
+  if (!fs.existsSync(targetStatic)) fs.mkdirSync(targetStatic, { recursive: true });
+  fs.copyFileSync(iconPath, path.join(targetStatic, 'icon.png'));
+  console.log('✅ 已复制网站图标 icon.png');
+}
+
 // ─── 复制 bgv ───
 if (fs.existsSync(bgvDir)) {
   const targetBgvDir = path.join(PUBLIC, 'static', 'bgv');
