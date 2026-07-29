@@ -400,7 +400,7 @@ function loadTrack(index) {
     audioEl.currentTime = parseFloat(localStorage.getItem('musicTime') || '0');
     audioEl.play().catch(function(){});
   };
-  document.getElementById('musicToggle').textContent = '⏸';
+  document.getElementById('musicToggle').textContent = '▶️';
   document.getElementById('musicToggle').classList.add('playing');
 }
 
