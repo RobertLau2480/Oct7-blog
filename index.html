@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>个人博客</title>
+<link rel="icon" type="image/png" href="/static/icon.png">
 </head>
 <body>
 <!-- 构建注入 -->
@@ -11,6 +12,7 @@
 <script>window.__FILES__ = {};</script>
 <script>window.__ARTICLE_PATH__ = "";</script>
 <script>window.__QUOTES__ = [];</script>
+<script>window.__PLAYLIST__ = [];</script>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
@@ -47,19 +49,27 @@ html{transition:color-scheme .25s}
   --sidebar-content-bg: rgba(255,255,255,0.93);
   --header-content-bg: rgba(255,255,255,0.93);
   --edge-blur-color: rgba(255,255,255,0.15);
+  --font-base: 16px;
+  --font-md-h1: 28px;
+  --font-md-h2: 22px;
+  --font-md-h3: 18px;
+  --font-md-body: 16px;
+  --font-sidebar: 14px;
+  --font-title: 16px;
 }
+[data-font="small"]{--font-base:14px;--font-md-h1:24px;--font-md-h2:19px;--font-md-h3:16px;--font-md-body:14px;--font-sidebar:12px;--font-title:14px}
+[data-font="large"]{--font-base:18px;--font-md-h1:32px;--font-md-h2:25px;--font-md-h3:21px;--font-md-body:18px;--font-sidebar:16px;--font-title:18px}
 [data-bg="neutral"]{--bg:#f0f0f0;--content-bg:rgba(245,245,245,0.88);--sidebar-content-bg:rgba(250,250,250,0.93);--header-content-bg:rgba(250,250,250,0.93);--edge-blur-color:rgba(255,255,255,0.18)}
 [data-bg="warm"]{--bg:#faf5eb;--content-bg:rgba(253,247,237,0.88);--sidebar-content-bg:rgba(255,250,240,0.93);--header-content-bg:rgba(255,250,240,0.93);--edge-blur-color:rgba(255,250,240,0.18)}
 [data-bg="cool"]{--bg:#eef4fa;--content-bg:rgba(237,244,252,0.88);--sidebar-content-bg:rgba(242,248,255,0.93);--header-content-bg:rgba(242,248,255,0.93);--edge-blur-color:rgba(242,248,255,0.18)}
-[data-theme="dark"]{--bg:#1a1a2e;--sidebar-bg:#16213e;--border:#2a2a4a;--text:#e0e0e0;--text-secondary:#a0a0b0;--hover:#1a1a3e;--active:#1a3a6e;--accent:#64b5f6;--code-bg:#1e1e3a;--shadow:0 2px 8px rgba(0,0,0,0.3);--header-bg:#16213e;--dropdown-bg:#16213e;--dropdown-hover:#1a1a3e;--overlay-bg:rgba(0,0,0,0.5);--blockquote-bg:#1a1a3e;--img-shadow:0 2px 8px rgba(0,0,0,0.3);--content-bg:rgba(26,26,46,0.88);--sidebar-content-bg:rgba(22,33,62,0.93);--header-content-bg:rgba(22,33,62,0.93);--edge-blur-color:rgba(0,0,0,0.12)}
+[data-theme="dark"]{--bg:#1a1a2e;--sidebar-bg:#2d2d38;--border:#3a3a48;--text:#e0e0e0;--text-secondary:#a0a0b0;--hover:#1a1a3e;--active:#1a3a6e;--accent:#64b5f6;--code-bg:#1e1e3a;--shadow:0 2px 8px rgba(0,0,0,0.3);--header-bg:#2d2d38;--dropdown-bg:#2d2d38;--dropdown-hover:#1a1a3e;--overlay-bg:rgba(0,0,0,0.5);--blockquote-bg:#1a1a3e;--img-shadow:0 2px 8px rgba(0,0,0,0.3);--content-bg:rgba(30,30,38,0.88);--sidebar-content-bg:rgba(45,45,55,0.93);--header-content-bg:rgba(45,45,55,0.93);--edge-blur-color:rgba(45,45,55,0.18)}
 [data-theme="dark"][data-bg="neutral"]{--content-bg:rgba(30,30,40,0.88);--sidebar-content-bg:rgba(35,35,50,0.93);--header-content-bg:rgba(35,35,50,0.93);--bg:#1e1e28;--sidebar-bg:#232332;--edge-blur-color:rgba(0,0,0,0.14)}
 [data-theme="dark"][data-bg="warm"]{--content-bg:rgba(40,35,28,0.88);--sidebar-content-bg:rgba(50,42,30,0.93);--header-content-bg:rgba(50,42,30,0.93);--bg:#282318;--sidebar-bg:#322a1e;--edge-blur-color:rgba(0,0,0,0.14)}
 [data-theme="dark"][data-bg="cool"]{--content-bg:rgba(26,30,42,0.88);--sidebar-content-bg:rgba(30,38,55,0.93);--header-content-bg:rgba(30,38,55,0.93);--bg:#1a1e2a;--sidebar-bg:#1e2637;--edge-blur-color:rgba(0,0,0,0.14)}
 
-/* 背景层 */
 .bg-layer{position:fixed;inset:0;z-index:-3;overflow:hidden;background:var(--bg)}
-.bg-video{position:absolute;width:100%;height:100%;object-fit:cover}
-.bg-image{position:absolute;width:100%;height:100%;object-fit:cover}
+.bg-video{position:absolute;width:100%;height:100%;object-fit:cover;opacity:0}
+.bg-image{position:absolute;width:100%;height:100%;object-fit:cover;opacity:0}
 .bg-blur-overlay{position:fixed;inset:0;z-index:-2;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .bg-edge-left,.bg-edge-right{position:fixed;top:0;bottom:0;z-index:-1;pointer-events:none}
 .bg-edge-left{left:0;width:calc((100% - 860px - var(--sidebar-width)) / 2 + var(--sidebar-width));backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);background:var(--edge-blur-color)}
@@ -69,14 +79,12 @@ html{transition:color-scheme .25s}
   .bg-edge-right{right:0;width:50%}
 }
 
-/* 内容层半透明 */
 .sidebar,.main-header,.content-wrapper,.menu-dropdown{background:var(--content-bg)}
 .sidebar{background:var(--sidebar-content-bg)}
 .main-header{background:var(--header-content-bg)}
 .menu-dropdown{background:var(--sidebar-content-bg)}
 .search-box{background:var(--content-bg)}
 
-/* ─── 修正：overlay z-index < sidebar z-index ─── */
 .overlay{display:none;position:fixed;inset:0;background:var(--overlay-bg);z-index:50}
 .overlay.show{display:block}
 
@@ -85,14 +93,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 .sidebar-header{padding:20px;border-bottom:1px solid var(--border)}
 .sidebar-header h1{font-size:20px;font-weight:700;color:var(--accent)}
 .sidebar-header p{font-size:12px;color:var(--text-secondary);margin-top:4px}
-.search-box{margin:12px 16px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;outline:none;transition:border-color .2s;color:var(--text)}
+.search-box{margin:12px 16px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:var(--font-sidebar);outline:none;transition:border-color .2s;color:var(--text)}
 .search-box:focus{border-color:var(--accent)}
 .search-box::placeholder{color:var(--text-secondary)}
 .tree-wrapper{flex:1;overflow-y:auto;padding:8px 0}
 .tree-wrapper::-webkit-scrollbar{width:6px}
 .tree-wrapper::-webkit-scrollbar-thumb{background:var(--text-secondary);border-radius:3px}
 .tree-item{cursor:pointer;user-select:none}
-.tree-item-inner{display:flex;align-items:center;gap:6px;padding:6px 16px;font-size:14px;color:var(--text);transition:background .15s}
+.tree-item-inner{display:flex;align-items:center;gap:6px;padding:6px 16px;font-size:var(--font-sidebar);color:var(--text);transition:background .15s}
 .tree-item-inner:hover{background:var(--hover)}
 .tree-item-inner.active{background:var(--active);color:var(--accent);font-weight:600}
 .tree-icon{width:16px;text-align:center;flex-shrink:0;font-size:12px;color:var(--text-secondary)}
@@ -104,28 +112,41 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 .main-header{display:flex;align-items:center;padding:8px 20px;border-bottom:1px solid var(--border);gap:8px;min-height:52px}
 .hamburger{display:none;background:none;border:none;font-size:20px;cursor:pointer;padding:4px 8px;color:var(--text);border-radius:4px}
 .hamburger:hover{background:var(--hover)}
-.desktop-title{font-size:16px;font-weight:600;color:var(--accent);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.desktop-title{font-size:var(--font-title);font-weight:600;color:var(--accent);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .header-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .header-btn{background:none;border:1px solid var(--border);font-size:18px;cursor:pointer;padding:6px 10px;color:var(--text);border-radius:6px;transition:all .2s;line-height:1;display:flex;align-items:center;justify-content:center}
 .header-btn:hover{background:var(--hover);border-color:var(--accent)}
-.menu-dropdown{position:fixed;right:20px;top:52px;border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);padding:8px 0;min-width:200px;z-index:200;display:none}
+.menu-dropdown{position:fixed;right:20px;top:52px;border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);padding:8px 12px;min-width:220px;z-index:200;display:none}
 .menu-dropdown.open{display:block}
-.menu-section{padding:6px 16px 4px;font-size:11px;font-weight:600;color:var(--text-secondary);letter-spacing:1px;text-transform:uppercase}
-.menu-dropdown-item{padding:8px 20px;font-size:14px;color:var(--text);cursor:pointer;transition:background .15s;white-space:nowrap;display:flex;align-items:center;gap:8px}
-.menu-dropdown-item:hover{background:var(--dropdown-hover)}
+.menu-section{padding:4px 4px 6px;font-size:11px;font-weight:600;color:var(--text-secondary);letter-spacing:1px;text-transform:uppercase}
+.bg-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 0 8px 0}
+.bg-grid-item{text-align:center;padding:8px 4px;font-size:13px;color:var(--text);cursor:pointer;border-radius:6px;transition:all .2s;background:var(--bg);border:1px solid var(--border)}
+.bg-grid-item:hover{background:var(--hover);border-color:var(--accent)}
+.bg-grid-item.active{background:var(--active);color:var(--accent);font-weight:600;border-color:var(--accent)}
+.font-row{display:flex;gap:6px;padding:8px 0 4px}
+.font-item{flex:1;text-align:center;padding:8px 4px;font-size:13px;color:var(--text);cursor:pointer;border-radius:6px;transition:all .2s;background:var(--bg);border:1px solid var(--border)}
+.font-item:hover{background:var(--hover);border-color:var(--accent)}
+.font-item.active{background:var(--active);color:var(--accent);font-weight:600;border-color:var(--accent)}
+.menu-divider{border:none;border-top:1px solid var(--border);margin:4px 0}
+.music-player{padding:4px 4px 8px}
+.music-info{font-size:13px;color:var(--accent);font-weight:600;text-align:center;padding:6px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.music-controls{display:flex;gap:6px;justify-content:center}
+.music-btn{background:none;border:1px solid var(--border);font-size:18px;cursor:pointer;padding:6px 14px;color:var(--text);border-radius:6px;transition:all .2s;line-height:1}
+.music-btn:hover{background:var(--hover);border-color:var(--accent)}
+.music-btn.playing{background:var(--active);border-color:var(--accent)}
 .content-wrapper{flex:1;overflow-y:auto;padding:40px;max-width:860px;width:100%;margin:0 auto}
 .content-wrapper::-webkit-scrollbar{width:8px}
 .content-wrapper::-webkit-scrollbar-thumb{background:var(--text-secondary);border-radius:4px}
-.markdown-body{line-height:1.8;font-size:16px;color:var(--text)}
-.markdown-body h1{font-size:28px;font-weight:700;margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid var(--border)}
-.markdown-body h2{font-size:22px;font-weight:600;margin:28px 0 12px}
-.markdown-body h3{font-size:18px;font-weight:600;margin:24px 0 8px}
+.markdown-body{line-height:1.8;font-size:var(--font-md-body);color:var(--text)}
+.markdown-body h1{font-size:var(--font-md-h1);font-weight:700;margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid var(--border)}
+.markdown-body h2{font-size:var(--font-md-h2);font-weight:600;margin:28px 0 12px}
+.markdown-body h3{font-size:var(--font-md-h3);font-weight:600;margin:24px 0 8px}
 .markdown-body p{margin:12px 0}
 .markdown-body ul,.markdown-body ol{margin:8px 0;padding-left:24px}
 .markdown-body li{margin:4px 0}
-.markdown-body code{background:var(--code-bg);padding:2px 6px;border-radius:4px;font-size:14px;font-family:"Fira Code","Consolas",monospace;color:var(--text)}
+.markdown-body code{background:var(--code-bg);padding:2px 6px;border-radius:4px;font-size:calc(var(--font-md-body) - 2px);font-family:"Fira Code","Consolas",monospace;color:var(--text)}
 .markdown-body pre{background:var(--code-bg);padding:16px;border-radius:8px;overflow-x:auto;margin:16px 0}
-.markdown-body pre code{background:none;padding:0;font-size:14px}
+.markdown-body pre code{background:none;padding:0;font-size:calc(var(--font-md-body) - 2px)}
 .markdown-body blockquote{border-left:4px solid var(--accent);padding:8px 16px;margin:16px 0;background:var(--blockquote-bg);color:var(--text-secondary)}
 .markdown-body img{max-width:100%;border-radius:8px;margin:16px 0;box-shadow:var(--img-shadow)}
 .markdown-body a{color:var(--accent);text-decoration:none}
@@ -144,10 +165,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 .sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);box-shadow:var(--shadow);transition:transform .3s ease}
 .sidebar.open{transform:translateX(0)}
 .content-wrapper{padding:20px 16px}
-.markdown-body{font-size:15px}
-.markdown-body h1{font-size:22px}
-.markdown-body h2{font-size:18px}
-.markdown-body h3{font-size:16px}
+.markdown-body{font-size:var(--font-md-body)}
+.markdown-body h1{font-size:var(--font-md-h1)}
+.markdown-body h2{font-size:var(--font-md-h2)}
+.markdown-body h3{font-size:var(--font-md-h3)}
 .desktop-title{display:none}
 .header-actions{margin-left:auto}
 .menu-dropdown{right:12px}
@@ -162,6 +183,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 <div class="bg-blur-overlay"></div>
 <div class="bg-edge-left"></div>
 <div class="bg-edge-right"></div>
+
+<audio id="bgAudio" preload="auto" style="display:none"></audio>
 
 <div class="overlay" id="overlay"></div>
 
@@ -185,11 +208,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
     </div>
   </div>
   <div class="menu-dropdown" id="menuDropdown">
-    <div class="menu-section">背景切换</div>
-    <div class="menu-dropdown-item" data-bg-option="video">🎬 视频背景</div>
-    <div class="menu-dropdown-item" data-bg-option="neutral">⬜ 中性</div>
-    <div class="menu-dropdown-item" data-bg-option="warm">🟨 暖色</div>
-    <div class="menu-dropdown-item" data-bg-option="cool">🟦 冷色</div>
+    <div class="menu-section">背景</div>
+    <div class="bg-grid">
+      <div class="bg-grid-item active" data-bg-option="video">🎬 视频</div>
+      <div class="bg-grid-item" data-bg-option="neutral">⬜ 中性</div>
+      <div class="bg-grid-item" data-bg-option="warm">🟨 暖色</div>
+      <div class="bg-grid-item" data-bg-option="cool">🟦 冷色</div>
+    </div>
+    <hr class="menu-divider">
+    <div class="menu-section">字体</div>
+    <div class="font-row">
+      <div class="font-item" data-font-option="small">A⁻ 小字</div>
+      <div class="font-item active" data-font-option="default">A 默认</div>
+      <div class="font-item" data-font-option="large">A⁺ 大字</div>
+    </div>
+    <hr class="menu-divider">
+    <div class="menu-section">音乐</div>
+    <div class="music-player" id="musicPlayer">
+      <div class="music-info" id="musicTitle">未播放</div>
+      <div class="music-controls">
+        <button class="music-btn" id="musicPrev" title="上一首">⏮</button>
+        <button class="music-btn" id="musicToggle" title="播放/暂停">⏸</button>
+        <button class="music-btn" id="musicNext" title="下一首">⏭</button>
+      </div>
+    </div>
   </div>
   <div class="content-wrapper" id="contentWrapper">
     <div class="empty-state" id="emptyState">
@@ -242,9 +284,8 @@ function getBgOption() {
 function setBgOption(opt) {
   localStorage.setItem('bgOption', opt);
   document.documentElement.setAttribute('data-bg', opt === 'video' ? '' : opt);
-  document.querySelectorAll('[data-bg-option]').forEach(el => {
-    el.style.fontWeight = el.dataset.bgOption === opt ? '600' : '';
-    el.style.color = el.dataset.bgOption === opt ? 'var(--accent)' : '';
+  document.querySelectorAll('.bg-grid-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.bgOption === opt);
   });
   updateBackground();
 }
@@ -256,7 +297,6 @@ function updateBackground() {
   const videoEl = document.getElementById('bgVideo');
   const imgEl = document.getElementById('bgImage');
 
-  // 先将当前显示的媒体淡出
   if (videoEl.style.display !== 'none') { videoEl.style.opacity = '0'; }
   if (imgEl.style.display !== 'none') { imgEl.style.opacity = '0'; }
 
@@ -264,48 +304,145 @@ function updateBackground() {
     if (opt === 'video') {
       if (isMobile) {
         videoEl.style.display = 'none';
-        imgEl.src = isDark ? 'static/bgv/dark_bg.jpg' : 'static/bgv/light_bg.jpg';
+      imgEl.src = isDark ? '/static/bgv/dark_bg.jpg' : '/static/bgv/light_bg.jpg';
         imgEl.style.display = 'block';
-        // 下一帧淡入
-        requestAnimationFrame(function() { imgEl.style.opacity = '1'; });
+        imgEl.onload = function() { requestAnimationFrame(function() { imgEl.style.opacity = '1'; }); };
+        if (imgEl.complete) { requestAnimationFrame(function() { imgEl.style.opacity = '1'; }); }
       } else {
         imgEl.style.display = 'none';
-        videoEl.src = isDark ? 'static/bgv/dark_bg.mp4' : 'static/bgv/light_bg.mp4';
+        videoEl.style.opacity = '0';
+        videoEl.src = isDark ? '/static/bgv/dark_bg.mp4' : '/static/bgv/light_bg.mp4';
         videoEl.style.display = 'block';
-        videoEl.play().catch(function(){});
-        requestAnimationFrame(function() { videoEl.style.opacity = '1'; });
+        videoEl.onloadeddata = function() {
+          requestAnimationFrame(function() { videoEl.style.opacity = '1'; });
+          videoEl.play().catch(function(){});
+        };
+        if (videoEl.readyState >= 2) {
+          requestAnimationFrame(function() { videoEl.style.opacity = '1'; });
+          videoEl.play().catch(function(){});
+        }
       }
     } else {
       videoEl.style.display = 'none';
       imgEl.style.display = 'none';
     }
-  }, 300); // 等待淡出完成再切换
+  }, 300);
 }
 
 (function() {
   const savedBg = localStorage.getItem('bgOption');
   if (savedBg && savedBg !== 'video') {
     document.documentElement.setAttribute('data-bg', savedBg);
-    document.querySelectorAll('[data-bg-option]').forEach(el => {
-      if (el.dataset.bgOption === savedBg) {
-        el.style.fontWeight = '600';
-        el.style.color = 'var(--accent)';
-      }
+    document.querySelectorAll('.bg-grid-item').forEach(el => {
+      if (el.dataset.bgOption === savedBg) el.classList.add('active');
     });
   }
   updateBackground();
 })();
 
-document.querySelectorAll('[data-bg-option]').forEach(el => {
+document.querySelectorAll('.bg-grid-item').forEach(el => {
   el.addEventListener('click', function(e) {
     e.stopPropagation();
     setBgOption(this.dataset.bgOption);
-    document.getElementById('menuDropdown').classList.remove('open');
   });
 });
 
 window.addEventListener('resize', function() {
   if (getBgOption() === 'video') updateBackground();
+});
+
+// ─── 字体大小切换 ───
+function getFontOption() {
+  return localStorage.getItem('fontOption') || 'default';
+}
+
+function setFontOption(opt) {
+  localStorage.setItem('fontOption', opt);
+  document.documentElement.setAttribute('data-font', opt === 'default' ? '' : opt);
+  document.querySelectorAll('.font-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.fontOption === opt);
+  });
+}
+
+(function() {
+  const savedFont = localStorage.getItem('fontOption');
+  if (savedFont && savedFont !== 'default') {
+    document.documentElement.setAttribute('data-font', savedFont);
+    document.querySelectorAll('.font-item').forEach(el => {
+      if (el.dataset.fontOption === savedFont) el.classList.add('active');
+    });
+  }
+})();
+
+document.querySelectorAll('.font-item').forEach(el => {
+  el.addEventListener('click', function(e) {
+    e.stopPropagation();
+    setFontOption(this.dataset.fontOption);
+  });
+});
+
+// ─── 音乐播放器 ───
+const playlist = window.__PLAYLIST__ || [];
+let currentTrack = parseInt(localStorage.getItem('musicTrack') || '0');
+const audioEl = document.getElementById('bgAudio');
+
+function loadTrack(index) {
+  if (playlist.length === 0) return;
+  if (index < 0) index = playlist.length - 1;
+  if (index >= playlist.length) index = 0;
+  currentTrack = index;
+  localStorage.setItem('musicTrack', currentTrack);
+  const song = playlist[currentTrack];
+  document.getElementById('musicTitle').textContent = song.name;
+  audioEl.src = '/' + song.file;
+  audioEl.load();
+  audioEl.onloadedmetadata = function() {
+    audioEl.currentTime = parseFloat(localStorage.getItem('musicTime') || '0');
+    audioEl.play().catch(function(){});
+  };
+  document.getElementById('musicToggle').textContent = '⏸';
+  document.getElementById('musicToggle').classList.add('playing');
+}
+
+function togglePlay() {
+  if (playlist.length === 0) return;
+  if (audioEl.paused) {
+    if (!audioEl.src) { loadTrack(currentTrack); return; }
+    audioEl.play().catch(function(){});
+    document.getElementById('musicToggle').textContent = '⏸';
+    document.getElementById('musicToggle').classList.add('playing');
+  } else {
+    audioEl.pause();
+    document.getElementById('musicToggle').textContent = '▶️';
+    document.getElementById('musicToggle').classList.remove('playing');
+  }
+}
+
+function nextTrack() { loadTrack(currentTrack + 1); }
+function prevTrack() { loadTrack(currentTrack - 1); }
+
+audioEl.addEventListener('timeupdate', function() {
+  localStorage.setItem('musicTime', audioEl.currentTime);
+});
+
+audioEl.addEventListener('ended', function() { nextTrack(); });
+
+if (playlist.length > 0) {
+  const savedTime = parseFloat(localStorage.getItem('musicTime') || '0');
+  if (savedTime > 0 || localStorage.getItem('musicTrack')) {
+    loadTrack(currentTrack);
+  }
+  document.getElementById('musicTitle').textContent = playlist[currentTrack].name;
+}
+
+document.getElementById('musicToggle').addEventListener('click', function(e) {
+  e.stopPropagation(); togglePlay();
+});
+document.getElementById('musicNext').addEventListener('click', function(e) {
+  e.stopPropagation(); nextTrack();
+});
+document.getElementById('musicPrev').addEventListener('click', function(e) {
+  e.stopPropagation(); prevTrack();
 });
 
 // ─── 菜单下拉 ───

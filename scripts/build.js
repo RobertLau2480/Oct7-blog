@@ -6,6 +6,8 @@ const PUBLIC = path.join(ROOT, 'public');
 const contentDir = path.join(ROOT, 'content');
 const imagesDir = path.join(contentDir, 'images');
 const quotesPath = path.join(ROOT, 'static', 'quotes.json');
+const bgmDir = path.join(ROOT, 'static', 'bgm');
+const bgvDir = path.join(ROOT, 'static', 'bgv');
 const htmlTemplate = path.join(ROOT, 'index.html');
 
 // 清空并重建 public 目录
@@ -45,6 +47,20 @@ function scan(dirPath, relPath = '') {
   return { tree, files };
 }
 
+// ─── 扫描 bgm ───
+let playlist = [];
+if (fs.existsSync(bgmDir)) {
+  for (const file of fs.readdirSync(bgmDir)) {
+    const ext = path.extname(file).toLowerCase();
+    if (ext === '.mp3' || ext === '.m4a' || ext === '.ogg' || ext === '.wav') {
+      playlist.push({
+        name: file.replace(/\.[^/.]+$/, ''),
+        file: `static/bgm/${file}`
+      });
+    }
+  }
+}
+
 // ─── 读取引言 ───
 let quotes = [];
 try {
@@ -60,25 +76,15 @@ function buildHtml(articlePath) {
   const treeStr = JSON.stringify({ tree }).replace(/<\//g, '<\\/');
   const filesStr = JSON.stringify(files).replace(/<\//g, '<\\/');
   const quotesStr = JSON.stringify(quotes).replace(/<\//g, '<\\/');
+  const playlistStr = JSON.stringify(playlist).replace(/<\//g, '<\\/');
 
   let html = fs.readFileSync(htmlTemplate, 'utf-8');
 
-  html = html.replace(
-    'window.__TREE__ = {"tree":[]};',
-    'window.__TREE__ = ' + treeStr + ';'
-  );
-  html = html.replace(
-    'window.__FILES__ = {};',
-    'window.__FILES__ = ' + filesStr + ';'
-  );
-  html = html.replace(
-    'window.__ARTICLE_PATH__ = "";',
-    'window.__ARTICLE_PATH__ = "' + articlePath + '";'
-  );
-  html = html.replace(
-    'window.__QUOTES__ = [];',
-    'window.__QUOTES__ = ' + quotesStr + ';'
-  );
+  html = html.replace('window.__TREE__ = {"tree":[]};', 'window.__TREE__ = ' + treeStr + ';');
+  html = html.replace('window.__FILES__ = {};', 'window.__FILES__ = ' + filesStr + ';');
+  html = html.replace('window.__ARTICLE_PATH__ = "";', 'window.__ARTICLE_PATH__ = "' + articlePath + '";');
+  html = html.replace('window.__QUOTES__ = [];', 'window.__QUOTES__ = ' + quotesStr + ';');
+  html = html.replace('window.__PLAYLIST__ = [];', 'window.__PLAYLIST__ = ' + playlistStr + ';');
 
   if (articlePath) {
     const articleLabel = articlePath
@@ -117,6 +123,7 @@ for (const [fileKey] of Object.entries(files)) {
   console.log(`  📄 ${fileKey} → /${path.relative(PUBLIC, outputPath).replace(/\\/g, '/')}`);
 }
 
+// ─── 复制图片 ───
 if (fs.existsSync(imagesDir)) {
   const targetImgDir = path.join(PUBLIC, 'content', 'images');
   fs.mkdirSync(targetImgDir, { recursive: true });
@@ -126,8 +133,7 @@ if (fs.existsSync(imagesDir)) {
   console.log(`✅ 已复制 ${fs.readdirSync(imagesDir).length} 张图片`);
 }
 
-// ─── 复制 bgv 视频背景 ───
-const bgvDir = path.join(ROOT, 'static', 'bgv');
+// ─── 复制 bgv ───
 if (fs.existsSync(bgvDir)) {
   const targetBgvDir = path.join(PUBLIC, 'static', 'bgv');
   fs.mkdirSync(targetBgvDir, { recursive: true });
@@ -137,4 +143,14 @@ if (fs.existsSync(bgvDir)) {
   console.log(`✅ 已复制 ${fs.readdirSync(bgvDir).length} 个背景视频/图片`);
 }
 
-console.log(`\n✨ 构建完成！${quotes.length} 条引言已注入，${Object.keys(files).length} 篇文章 + 首页`);
+// ─── 复制 bgm ───
+if (fs.existsSync(bgmDir)) {
+  const targetBgmDir = path.join(PUBLIC, 'static', 'bgm');
+  fs.mkdirSync(targetBgmDir, { recursive: true });
+  for (const file of fs.readdirSync(bgmDir)) {
+    fs.copyFileSync(path.join(bgmDir, file), path.join(targetBgmDir, file));
+  }
+  console.log(`✅ 已复制 ${fs.readdirSync(bgmDir).length} 首音乐`);
+}
+
+console.log(`\n✨ 构建完成！${playlist.length} 首音乐，${quotes.length} 条引言，${Object.keys(files).length} 篇文章 + 首页`);
