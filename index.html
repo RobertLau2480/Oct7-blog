@@ -312,7 +312,7 @@ function loadTrack(index){
   if(aE.src&&aE.src.indexOf(src)!==-1&&aE.readyState>=2){aE.currentTime=Math.min(t,aE.duration||t);aE.play().catch(function(){});updatePlayBtn();return}
   var h=aE._lh;if(h)aE.removeEventListener('loadedmetadata',h);
   aE.src=src;aE.load();
-  var handler=function(){var tm=Math.min(t,aE.duration||t);aE.currentTime=tm;aE.play().catch(function(){});aE.removeEventListener('loadedmetadata',handler);aE._lh=null};
+var handler=function(){var tm=Math.min(t,aE.duration||t);aE.currentTime=tm;if(aE._pendingPlay){aE.play().catch(function(){});aE._pendingPlay=false}aE.removeEventListener('loadedmetadata',handler);aE._lh=null};
   aE.addEventListener('loadedmetadata',handler);aE._lh=handler;
   updatePlayBtn();
 }
@@ -326,7 +326,15 @@ aE.addEventListener('pause',function(){updatePlayBtn()});
 var sV=parseFloat(localStorage.getItem('musicVolume')||'0.8');aE.volume=sV;document.getElementById('volumeSlider').value=sV*100;
 document.getElementById('volumeSlider').addEventListener('input',function(e){e.stopPropagation();var v=this.value/100;aE.volume=v;localStorage.setItem('musicVolume',v)});
 aE.addEventListener('ended',function(){nextTrack()});
-if(pList.length){var _t=parseFloat(localStorage.getItem('musicTime')||'0');if(_t>0||localStorage.getItem('musicTrack'))loadTrack(cT);document.getElementById('musicTitle').textContent=pList[cT].name}
+if(pList.length){
+  var _t=parseFloat(localStorage.getItem('musicTime')||'0');
+  document.getElementById('musicTitle').textContent=pList[cT].name;
+  if(_t>0||localStorage.getItem('musicTrack')){
+    loadTrack(cT);
+    // 浏览器可能阻止自动播放，用户需手动点击播放按钮
+    // 此时按钮显示▶️，点击后即可播放
+  }
+}
 document.getElementById('musicToggle').addEventListener('click',function(e){e.stopPropagation();togglePlay()});
 document.getElementById('musicNext').addEventListener('click',function(e){e.stopPropagation();nextTrack()});
 document.getElementById('musicPrev').addEventListener('click',function(e){e.stopPropagation();prevTrack()});

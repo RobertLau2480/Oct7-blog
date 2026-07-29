@@ -47,6 +47,20 @@ function scan(dirPath, relPath = '') {
       files[fileKey] = fs.readFileSync(fullPath, 'utf-8');
     }
   }
+  // 排序：个人博客首位，文件夹中间，关于/留言最后
+  const priority = { '个人博客.md': -2, '关于.md': 999, '留言.md': 999 };
+  function rank(n) {
+    const p = priority[n.name];
+    if (p !== undefined) return p;        // 指定优先级
+    if (n.type === 'folder') return 500;  // 文件夹统一排在中间
+    return 0;                              // 普通文件按名字排序
+  }
+  tree.sort((a, b) => {
+    const ra = rank(a), rb = rank(b);
+    if (ra !== rb) return ra - rb;
+    if (a.type !== b.type) return a.type === 'folder' ? 1 : -1;
+    return a.name.localeCompare(b.name, 'zh-CN');
+  });
   return { tree, files };
 }
 
