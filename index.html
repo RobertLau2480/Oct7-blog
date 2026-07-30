@@ -56,7 +56,8 @@ html{transition:color-scheme .25s}
 .overlay{display:none;position:fixed;inset:0;background:var(--overlay-bg);z-index:50}
 .overlay.show{display:block}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif;color:var(--text);height:100vh;display:flex;overflow:hidden;position:relative}
-.sidebar{width:var(--sidebar-width);min-width:var(--sidebar-width);height:100vh;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:100}
+.sidebar{width:var(--sidebar-width);min-width:var(--sidebar-width);height:100vh;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:100;transition:width .35s ease,min-width .35s ease,border-color .35s ease}
+.sidebar.hidden{width:0;min-width:0;border-right-color:transparent;overflow:hidden}
 .sidebar-header{padding:20px;border-bottom:1px solid var(--border);cursor:pointer}
 .sidebar-header h1{font-size:20px;font-weight:700;color:var(--accent)}
 .sidebar-header p{font-size:12px;color:var(--text-secondary);margin-top:4px}
@@ -77,6 +78,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 .tree-children.open{display:block}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .main-header{display:flex;align-items:center;padding:8px 20px;border-bottom:1px solid var(--border);gap:8px;min-height:52px}
+/* ─── 侧栏切换按钮（仅桌面端） ─── */
+.sidebar-toggle{display:flex;background:none;border:none;font-size:14px;cursor:pointer;padding:4px 8px;color:var(--text);border-radius:4px;align-items:center;justify-content:center;width:28px;transition:transform .3s ease}
+.sidebar-toggle:hover{background:var(--hover)}
+@media(max-width:768px){.sidebar-toggle{display:none}}
+
 .hamburger{display:none;background:none;border:none;font-size:20px;cursor:pointer;padding:4px 8px;color:var(--text);border-radius:4px}
 .hamburger:hover{background:var(--hover)}
 .desktop-title{font-size:var(--font-title);font-weight:600;color:var(--accent);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -101,13 +107,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 .music-btn{background:none;border:1px solid var(--border);font-size:18px;cursor:pointer;padding:6px 14px;color:var(--text);border-radius:6px;transition:all .2s;line-height:1}
 .music-btn:hover{background:var(--hover);border-color:var(--accent)}
 .music-btn.playing{background:var(--active);border-color:var(--accent)}
+.music-btn.loading{position:relative;pointer-events:none;opacity:.7}
+.music-btn .spinner{display:none;width:18px;height:18px;border:2px solid var(--border);border-top:2px solid var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
+.music-btn.loading .spinner{display:block}
+.music-btn.loading .btn-icon{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
 #giscus-container{position:relative;width:100%}
 .volume-row{padding:6px 2px 0;display:flex;align-items:center;gap:8px}
 .volume-slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:var(--border);outline:none;cursor:pointer}
 .volume-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;transition:transform .15s}
 .volume-slider::-webkit-slider-thumb:hover{transform:scale(1.2)}
 .volume-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);border:none;cursor:pointer}
-.content-wrapper{flex:1;overflow-y:auto;padding:40px;max-width:860px;width:100%;margin:0 auto}
+.content-wrapper{flex:1;overflow-y:auto;padding:40px;max-width:860px;width:100%;margin:0 auto;transition:max-width .35s ease}
 .content-wrapper::-webkit-scrollbar{width:8px}
 .content-wrapper::-webkit-scrollbar-thumb{background:var(--text-secondary);border-radius:4px}
 .markdown-body{line-height:1.8;font-size:var(--font-md-body);color:var(--text)}
@@ -157,6 +168,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 .markdown-body .glass-card .card-icon,.markdown-body .shelf-card .shelf-icon{font-size:26px;margin-bottom:0}
 .markdown-body .glass-card .card-preview{justify-content:flex-start}
 }
+/* ─── 回到顶部按钮 ─── */
+.top-btn{position:absolute;bottom:24px;right:24px;width:42px;height:42px;border-radius:50%;background:var(--bg);color:var(--text-secondary);font-size:18px;font-weight:700;line-height:42px;text-align:center;cursor:pointer;z-index:10;box-shadow:0 2px 10px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease,background .25s ease,color .25s ease;user-select:none;touch-action:none;border:1px solid var(--border)}
+.top-btn.show{opacity:1;pointer-events:auto}
+.top-btn:hover{transform:scale(1.1);background:var(--hover);color:var(--accent)}
+@media(max-width:768px){.top-btn{bottom:16px;right:16px;width:38px;height:38px;font-size:16px;line-height:38px}}
+
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-secondary)}
 .empty-state h2{font-size:24px;margin-bottom:8px}.empty-state p{font-size:14px}
 @media(max-width:768px){
@@ -200,6 +217,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 <div class="main">
   <div class="main-header">
     <button class="hamburger" id="hamburgerBtn">☰</button>
+    <button class="sidebar-toggle" id="sidebarToggle" title="切换侧栏">⇐</button>
     <span class="desktop-title" id="desktopTitle">安巢鸟的小站</span>
     <span id="mobileTitle" style="font-size:15px;font-weight:600;color:var(--text);display:none;">安巢鸟的小站</span>
     <div class="header-actions">
@@ -228,7 +246,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
       <div class="music-info" id="musicTitle">未播放</div>
       <div class="music-controls">
         <button class="music-btn" id="musicPrev" title="上一首">⏮</button>
-        <button class="music-btn" id="musicToggle" title="播放/暂停">▶️</button>
+        <button class="music-btn" id="musicToggle" title="播放/暂停"><span class="spinner"></span><span class="btn-icon">▶️</span></button>
         <button class="music-btn" id="musicNext" title="下一首">⏭</button>
       </div>
       <div class="volume-row">
@@ -237,6 +255,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
     </div>
   </div>
   <div class="content-wrapper" id="contentWrapper">
+    <div class="top-btn" id="topBtn" title="回到顶部">🡅</div>
     <div class="empty-state" id="emptyState">
       <h2>👋 欢迎</h2>
       <p>从左侧目录选择一篇文章开始阅读</p>
@@ -255,9 +274,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 })();
 function toggleTheme() {
   var h = document.documentElement;
-  if (h.getAttribute('data-theme') === 'dark') { h.removeAttribute('data-theme'); localStorage.setItem('theme', 'light'); document.getElementById('themeToggle').textContent = '🌙'; }
+  var isDark = h.getAttribute('data-theme') === 'dark';
+  if (isDark) { h.removeAttribute('data-theme'); localStorage.setItem('theme', 'light'); document.getElementById('themeToggle').textContent = '🌙'; }
   else { h.setAttribute('data-theme', 'dark'); localStorage.setItem('theme', 'dark'); document.getElementById('themeToggle').textContent = '☀️'; }
   updateBackground();
+  // 同步 Giscus 深浅色
+  var newTheme = isDark ? 'light' : 'dark';
+  var gFrame = document.querySelector('iframe.giscus-frame');
+  if (gFrame) {
+    gFrame.contentWindow.postMessage({ giscus: { setConfig: { theme: newTheme } } }, 'https://giscus.app');
+  }
 }
 document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 (function() { document.getElementById('themeToggle').textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙'; })();
@@ -308,15 +334,17 @@ function loadTrack(index){
   cT=index;localStorage.setItem('musicTrack',cT);
   var s=pList[cT],t=parseFloat(localStorage.getItem('musicTime')||'0'),src='/'+s.file;
   document.getElementById('musicTitle').textContent=s.name;
+  // 显示加载中
+  var tb=document.getElementById('musicToggle');tb.classList.add('loading');
   aE.pause();
-  if(aE.src&&aE.src.indexOf(src)!==-1&&aE.readyState>=2){aE.currentTime=Math.min(t,aE.duration||t);aE.play().catch(function(){});updatePlayBtn();return}
+  if(aE.src&&aE.src.indexOf(src)!==-1&&aE.readyState>=2){aE.currentTime=Math.min(t,aE.duration||t);aE.play().catch(function(){});tb.classList.remove('loading');updatePlayBtn();return}
   var h=aE._lh;if(h)aE.removeEventListener('loadedmetadata',h);
   aE.src=src;aE.load();
-var handler=function(){var tm=Math.min(t,aE.duration||t);aE.currentTime=tm;if(aE._pendingPlay){aE.play().catch(function(){});aE._pendingPlay=false}aE.removeEventListener('loadedmetadata',handler);aE._lh=null};
+var handler=function(){var tm=Math.min(t,aE.duration||t);aE.currentTime=tm;tb.classList.remove('loading');aE.play().catch(function(){});aE.removeEventListener('loadedmetadata',handler);aE._lh=null};
   aE.addEventListener('loadedmetadata',handler);aE._lh=handler;
   updatePlayBtn();
 }
-function updatePlayBtn(){var b=document.getElementById('musicToggle');if(!aE.paused&&!aE.ended){b.textContent='⏸';b.classList.add('playing')}else{b.textContent='▶️';b.classList.remove('playing')}}
+function updatePlayBtn(){var b=document.getElementById('musicToggle'),c=b.querySelector('.btn-icon');if(!aE.paused&&!aE.ended){c.textContent='⏸';b.classList.add('playing')}else{c.textContent='▶️';b.classList.remove('playing')}}
 function togglePlay(){if(!pList.length)return;if(aE.paused){if(!aE.src){loadTrack(cT);return}aE.play().catch(function(){});updatePlayBtn()}else{aE.pause();updatePlayBtn()}}
 function nextTrack(){loadTrack(cT+1)}
 function prevTrack(){loadTrack(cT-1)}
@@ -486,6 +514,15 @@ function loadFile(path,element){
   document.getElementById('emptyState').style.display='none';
   var mdBody=document.getElementById('markdownBody');mdBody.style.display='block';
   var basePath=path.lastIndexOf('/')!==-1?path.substring(0,path.lastIndexOf('/')):'content';
+  // 处理 Obsidian 图片语法 ![[filename.ext#hash|size]] → <img src="...">
+  // 所有图片统一放在 content/images/ 目录下
+  mdText = mdText.replace(/!\[\[([^\]|]+?)(?:#([^\]]*?))?(?:\|(\d+))?\]\]/g, function(m, fname, hash, size) {
+    var res = '<img src="/content/images/' + fname + '"';
+    if (size) res += ' width="' + size + '"';
+    if (hash === 'pic_center') res += ' style="display:block;margin:0 auto"';
+    res += '>';
+    return res;
+  });
   mdBody.innerHTML=marked.parse(mdText.replace(/!\[([^\]]*)\]\(\.\/images\//g,'![$1]('+basePath+'/images/'));
   mdBody.querySelectorAll('img').forEach(function(img){img.style.cursor='zoom-in';img.addEventListener('click',function(){window.open(this.src,'_blank')})});
   // Giscus
@@ -520,11 +557,90 @@ function filterTree(q){
   });
 }
 
+
+// ─── 桌面端侧栏切换（带滑动动画） ───
+(function(){
+  var sidebar=document.getElementById('sidebar'),toggle=document.getElementById('sidebarToggle'),main=document.querySelector('.main');
+  function setSidebarState(hidden){
+    var cw=document.getElementById('contentWrapper');
+    if(hidden){
+      sidebar.classList.add('hidden');
+      cw.style.maxWidth='1200px';
+      toggle.textContent='⇒';
+      localStorage.setItem('sidebarHidden','true');
+    }else{
+      sidebar.classList.remove('hidden');
+      cw.style.maxWidth='860px';
+      toggle.textContent='⇐';
+      localStorage.setItem('sidebarHidden','false');
+    }
+  }
+  // 从 localStorage 恢复
+  if(localStorage.getItem('sidebarHidden')==='true') setSidebarState(true);
+  toggle.addEventListener('click',function(){
+    setSidebarState(sidebar.classList.contains('hidden')?false:true);
+  });
+})();
+
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show')}
 document.getElementById('hamburgerBtn').addEventListener('click',function(){document.getElementById('sidebar').classList.add('open');document.getElementById('overlay').classList.add('show')});
 document.getElementById('overlay').addEventListener('click',closeSidebar);
 
 function findFirstLeafFile(nodes){for(var i=0;i<nodes.length;i++){if(nodes[i].type==='file')return nodes[i];if(nodes[i].children){var f=findFirstLeafFile(nodes[i].children);if(f)return f}}return null}
+
+// ─── 回到顶部按钮 ───
+(function(){
+  var btn=document.getElementById('topBtn'),wrapper=document.getElementById('contentWrapper');
+  if(!btn||!wrapper)return;
+  var isDragging=false,startX,startY,origX,origY;
+  // 显示/隐藏
+  wrapper.addEventListener('scroll',function(){
+    if(wrapper.scrollTop>wrapper.clientHeight*0.7){btn.classList.add('show')}
+    else{btn.classList.remove('show')}
+  });
+  // 点击回到顶部
+  btn.addEventListener('click',function(e){
+    if(isDragging){isDragging=false;return}
+    wrapper.scrollTo({top:0,behavior:'smooth'})
+  });
+  // 拖动
+  btn.addEventListener('mousedown',function(e){
+    isDragging=false;startX=e.clientX;startY=e.clientY;
+    origX=parseFloat(btn.style.right)||24;origY=parseFloat(btn.style.bottom)||24;
+    function onMove(e2){
+      var dx=startX-e2.clientX,dy=startY-e2.clientY;
+      if(Math.abs(dx)>5||Math.abs(dy)>5)isDragging=true;
+      var newRight=Math.max(8,Math.min(origX+dx,wrapper.clientWidth-btn.offsetWidth-8));
+      var newBottom=Math.max(8,Math.min(origY+dy,wrapper.clientHeight-btn.offsetHeight-8));
+      btn.style.right=newRight+'px';btn.style.bottom=newBottom+'px';
+    }
+    function onUp(){document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp)}
+    document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
+    e.preventDefault();
+  });
+  // 触屏拖动
+  btn.addEventListener('touchstart',function(e){
+    isDragging=false;var t=e.touches[0];
+    startX=t.clientX;startY=t.clientY;
+    origX=parseFloat(btn.style.right)||24;origY=parseFloat(btn.style.bottom)||24;
+    function onMove(e2){e2.preventDefault();var t2=e2.touches[0];
+      var dx=startX-t2.clientX,dy=startY-t2.clientY;
+      if(Math.abs(dx)>5||Math.abs(dy)>5)isDragging=true;
+      var newRight=Math.max(8,Math.min(origX+dx,wrapper.clientWidth-btn.offsetWidth-8));
+      var newBottom=Math.max(8,Math.min(origY+dy,wrapper.clientHeight-btn.offsetHeight-8));
+      btn.style.right=newRight+'px';btn.style.bottom=newBottom+'px';
+    }
+    function onUp(){document.removeEventListener('touchmove',onMove);document.removeEventListener('touchend',onUp)}
+    document.addEventListener('touchmove',onMove,{passive:false});document.addEventListener('touchend',onUp);
+  },{passive:true});
+  // 窗口尺寸变化时确保不超出边界
+  window.addEventListener('resize',function(){
+    var r=parseFloat(btn.style.right)||24,b=parseFloat(btn.style.bottom)||24;
+    btn.style.right=Math.min(r,wrapper.clientWidth-btn.offsetWidth-8)+'px';
+    btn.style.bottom=Math.min(b,wrapper.clientHeight-btn.offsetHeight-8)+'px';
+  });
+})();
+
 </script>
 </body>
 </html>
