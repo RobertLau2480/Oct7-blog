@@ -388,7 +388,7 @@ function navigateTo(url) {
   // /关于.html → content/关于.md
   // /杂谈/01 网名的故事.html → content/杂谈/01 网名的故事.md
   // /杂谈/ → content/杂谈/index.md
-  var fileKey = url.replace(/^\//, '');
+  var fileKey = decodeURIComponent(url.replace(/^\//, ''));
   if (fileKey === '' || fileKey === 'index.html') { fileKey = 'content/index.md'; }
   else { fileKey = 'content/' + fileKey.replace(/\/$/, '/index').replace(/\.html$/, '') + '.md'; }
 
@@ -435,7 +435,25 @@ function navigateTo(url) {
   document.title = label;
 }
 
-// 拦截侧栏导航
+// ─── 全局拦截所有内部链接，避免整页刷新 ───
+document.addEventListener('click', function(e){
+  var link = e.target.closest('a[href]');
+  if (!link) return;
+  var href = link.getAttribute('href');
+  // 只处理本站内部链接，跳过外部链接和锚点
+  if (href && !href.startsWith('http') && !href.startsWith('//') && !href.startsWith('#') && !href.startsWith('mailto:')) {
+    // 确保以 / 开头，且是本站页面
+    var normalized = href.startsWith('/') ? href : '/' + href;
+    // 补上 .html 后缀（如 /个人博客 → /个人博客.html）
+    if (!normalized.includes('.')) normalized += '.html';
+    // 检查是不是 contentMap 中的有效页面
+    var testKey = 'content/' + normalized.replace(/^\//,'').replace(/\.html$/,'') + '.md';
+    if (contentMap[testKey]) {
+      e.preventDefault();
+      navigateTo(normalized);
+    }
+  }
+});
 document.getElementById('sidebarHeader').addEventListener('click', function(){ navigateTo('/'); });
 document.getElementById('treeWrapper').addEventListener('click', function(e){
   var target = e.target.closest('.tree-item-inner');
@@ -497,7 +515,7 @@ function renderTree(nodes,container,depth,parentPath){
       inner.innerHTML='<span class="tree-arrow">▶</span><span class="tree-icon">📁</span><span>'+esc(node.name)+'</span>';
       var arrow=inner.querySelector('.tree-arrow');
       arrow.addEventListener('click',function(e){e.stopPropagation();this.classList.toggle('open');item.querySelector('.tree-children').classList.toggle('open')});
-      inner.addEventListener('click',function(e){e.stopPropagation();navigateTo(folderPath+'/')});
+      inner.addEventListener('click',function(e){e.stopPropagation();navigateTo(folderPath+'/index.html')});
       item.appendChild(inner);
       var ch=document.createElement('div');ch.className='tree-children';renderTree(node.children||[],ch,depth+1,folderPath);item.appendChild(ch);
     } else {
