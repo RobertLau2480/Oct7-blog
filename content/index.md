@@ -50,7 +50,7 @@
 </div>
 
 <div class="friend-link">
-  Oct 的网站：<a href="https://octseven.us.kg/">octseven.us.kg</a>
+  Oct7 的网站：<a href="https://octseven.us.kg/">octseven.us.kg</a>
 </div>
 </div>
 
