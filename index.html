@@ -27,9 +27,11 @@ const quotesData = window.__QUOTES__ || [];
 </script>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;transition:background-color .25s ease,color .25s ease,border-color .25s ease,box-shadow .25s ease,opacity .25s ease}
-.bg-video,.bg-image{transition:opacity .25s ease}
+/* 性能优化：不对所有元素应用过渡，只对需要动画的元素 */
 html{transition:color-scheme .25s}
+*{margin:0;padding:0;box-sizing:border-box}
+.site-main,.sidebar,.bg-layer,.bg-blur-overlay,.bg-edge-overlay,.search-box,.tree-item-inner,.header-btn,.sidebar-toggle,.menu-dropdown,.top-btn,.content-wrapper,.markdown-body,.music-btn{transition:background-color .25s ease,color .25s ease,border-color .25s ease,box-shadow .25s ease,opacity .25s ease}
+.bg-video,.bg-image{transition:opacity .25s ease}
 :root{--sidebar-width:280px;--bg:#f8f9fa;--sidebar-bg:#fff;--border:#e0e0e0;--text:#333;--text-secondary:#666;--hover:#f0f0f0;--active:#e3f2fd;--accent:#1976d2;--code-bg:#f5f5f5;--shadow:0 2px 8px rgba(0,0,0,.08);--header-bg:#fff;--dropdown-bg:#fff;--dropdown-hover:#f0f0f0;--overlay-bg:rgba(0,0,0,.3);--blockquote-bg:#f8fbff;--img-shadow:0 2px 8px rgba(0,0,0,.08);--content-bg:rgba(248,249,250,.88);--sidebar-content-bg:rgba(255,255,255,.93);--header-content-bg:rgba(255,255,255,.93);--edge-blur-color:rgba(255,255,255,.15);--font-base:16px;--font-md-h1:28px;--font-md-h2:22px;--font-md-h3:18px;--font-md-body:16px;--font-sidebar:14px;--font-title:16px}
 [data-font="small"]{--font-base:14px;--font-md-h1:24px;--font-md-h2:19px;--font-md-h3:16px;--font-md-body:14px;--font-sidebar:12px;--font-title:14px}
 [data-font="large"]{--font-base:18px;--font-md-h1:32px;--font-md-h2:25px;--font-md-h3:21px;--font-md-body:18px;--font-sidebar:16px;--font-title:18px}
@@ -44,11 +46,15 @@ html{transition:color-scheme .25s}
 .bg-video{position:absolute;width:100%;height:100%;object-fit:cover;opacity:0}
 .bg-image{position:absolute;width:100%;height:100%;object-fit:cover;opacity:0}
 .bg-blur-overlay{position:fixed;inset:0;z-index:-2;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
-.bg-edge-left,.bg-edge-right{position:fixed;top:0;bottom:0;z-index:-1;pointer-events:none}
-.bg-edge-left{left:0;width:calc((100% - 860px - var(--sidebar-width)) / 2 + var(--sidebar-width));backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);background:var(--edge-blur-color)}
-.bg-edge-right{right:0;width:calc((100% - 860px) / 2);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);background:var(--edge-blur-color)}
-@media(max-width:768px){.bg-edge-left{left:0;width:50%}.bg-edge-right{right:0;width:50%}}
-.sidebar,.main-header,.content-wrapper,.menu-dropdown{background:var(--content-bg)}
+.bg-edge-overlay{position:fixed;inset:0;z-index:-1;pointer-events:none;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);background:var(--edge-blur-color)}
+.sidebar,.main-header,.menu-dropdown,.content-wrapper{background:var(--content-bg)}
+.content-wrapper.transparent{background:transparent}
+/* 主页用单层底色提高对比度 */
+.content-wrapper.transparent .home-wrapper{background:rgba(248,249,250,.55);border-radius:12px;padding:20px 24px;margin:0}
+.content-wrapper.transparent .home-header,
+.content-wrapper.transparent .author-words{padding:0;margin:0;background:none}
+.content-wrapper.transparent .card-grid{margin:20px -2px 0}
+[data-theme="dark"] .content-wrapper.transparent .home-wrapper{background:rgba(26,26,46,.55)}
 .sidebar{background:var(--sidebar-content-bg)}
 .main-header{background:var(--header-content-bg)}
 .menu-dropdown{background:var(--sidebar-content-bg)}
@@ -198,8 +204,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
   <img class="bg-image" id="bgImage" alt="" style="display:none">
 </div>
 <div class="bg-blur-overlay"></div>
-<div class="bg-edge-left"></div>
-<div class="bg-edge-right"></div>
 
 <audio id="bgAudio" preload="auto" style="display:none" src></audio>
 
@@ -511,6 +515,10 @@ function loadFile(path,element){
   if(element)element.classList.add('active');
   var mdText=contentMap[path];
   if(!mdText){document.getElementById('markdownBody').innerHTML='<p style="color:#d32f2f;">❌ 文章内容未找到</p>';return}
+  // 主页正文透明，其他页面恢复半透明背景
+  var cw=document.getElementById('contentWrapper');
+  if(path==='content/index.md'){cw.classList.add('transparent')}else{cw.classList.remove('transparent')}
+
   document.getElementById('emptyState').style.display='none';
   var mdBody=document.getElementById('markdownBody');mdBody.style.display='block';
   var basePath=path.lastIndexOf('/')!==-1?path.substring(0,path.lastIndexOf('/')):'content';
