@@ -3,17 +3,24 @@ const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
 const PUBLIC = path.join(ROOT, 'public');
-const SRC = p => path.join(ROOT, p);
-const DST = p => path.join(PUBLIC, p);
+const contentDir = path.join(ROOT, 'content');
+const imagesDir = path.join(contentDir, 'images');
+const quotesPath = path.join(ROOT, 'static', 'quotes.json');
+const bgmDir = path.join(ROOT, 'static', 'bgm');
+const bgvDir = path.join(ROOT, 'static', 'bgv');
+const htmlTemplate = path.join(ROOT, 'index.html');
 
-// 清空并重建 public
-if (fs.existsSync(PUBLIC)) fs.rmSync(PUBLIC, { recursive: true, force: true });
+// 清空并重建 public 目录
+if (fs.existsSync(PUBLIC)) {
+  fs.rmSync(PUBLIC, { recursive: true, force: true });
+}
 fs.mkdirSync(PUBLIC, { recursive: true });
 
-// 扫描 content 目录
+// ─── 扫描 content ───
 function scan(dirPath, relPath = '') {
   const items = fs.readdirSync(dirPath, { withFileTypes: true });
-  const tree = [], files = {};
+  const tree = [];
+  const files = {};
 
   for (const item of items) {
     if (item.name.startsWith('.') || item.name === 'images') continue;
@@ -28,64 +35,103 @@ function scan(dirPath, relPath = '') {
       }
     } else if (item.name.endsWith('.md')) {
       const fileKey = `content/${itemRel}`;
-      if (item.name !== 'index.md') tree.push({ name: item.name, type: 'file', path: fileKey, label: item.name.replace(/\.md$/, '') });
+      // 不把 index.md 作为单独文件条目加入 tree（由文件夹代表）
+      if (item.name !== 'index.md') {
+        tree.push({
+          name: item.name,
+          type: 'file',
+          path: fileKey,
+          label: item.name.replace(/\.md$/, '')
+        });
+      }
       files[fileKey] = fs.readFileSync(fullPath, 'utf-8');
     }
   }
-
   // 排序：个人博客首位，文件夹中间，关于/留言最后
   const priority = { '个人博客.md': -2, '关于.md': 999, '留言.md': 999 };
+  function rank(n) {
+    const p = priority[n.name];
+    if (p !== undefined) return p;        // 指定优先级
+    if (n.type === 'folder') return 500;  // 文件夹统一排在中间
+    return 0;                              // 普通文件按名字排序
+  }
   tree.sort((a, b) => {
-    const ra = priority[a.name] ?? (a.type === 'folder' ? 500 : 0);
-    const rb = priority[b.name] ?? (b.type === 'folder' ? 500 : 0);
-    return ra - rb || (a.type === b.type ? a.name.localeCompare(b.name, 'zh-CN') : a.type === 'folder' ? 1 : -1);
+    const ra = rank(a), rb = rank(b);
+    if (ra !== rb) return ra - rb;
+    if (a.type !== b.type) return a.type === 'folder' ? 1 : -1;
+    return a.name.localeCompare(b.name, 'zh-CN');
   });
   return { tree, files };
 }
 
-// 读取引言
-let quotes = [];
-try { quotes = JSON.parse(fs.readFileSync(SRC('static/quotes.json'), 'utf-8')); } catch { /* 忽略 */ }
-
-// 扫描音乐
-const playlist = [];
-if (fs.existsSync(SRC('static/bgm'))) {
-  for (const file of fs.readdirSync(SRC('static/bgm'))) {
-    if (['.mp3','.m4a','.ogg','.wav'].includes(path.extname(file).toLowerCase()))
-      playlist.push({ name: file.replace(/\.[^/.]+$/, ''), file: `static/bgm/${file}` });
+// ─── 扫描 bgm ───
+let playlist = [];
+if (fs.existsSync(bgmDir)) {
+  for (const file of fs.readdirSync(bgmDir)) {
+    const ext = path.extname(file).toLowerCase();
+    if (ext === '.mp3' || ext === '.m4a' || ext === '.ogg' || ext === '.wav') {
+      playlist.push({
+        name: file.replace(/\.[^/.]+$/, ''),
+        file: `static/bgm/${file}`
+      });
+    }
   }
 }
 
-const { tree, files } = scan(SRC('content'));
+// ─── 读取引言 ───
+let quotes = [];
+try {
+  quotes = JSON.parse(fs.readFileSync(quotesPath, 'utf-8'));
+} catch {
+  quotes = [];
+}
 
-// 构建 HTML
+const { tree, files } = scan(contentDir);
+
+// ─── 构建输出 HTML ───
 function buildHtml(articlePath) {
-  let html = fs.readFileSync(SRC('index.html'), 'utf-8');
-  const esc = s => JSON.stringify(s).replace(/<\//g, '<\\/');
-  html = html.replace('window.__TREE__ = {"tree":[]};', `window.__TREE__ = ${esc({ tree })};`);
-  html = html.replace('window.__FILES__ = {};', `window.__FILES__ = ${esc(files)};`);
-  html = html.replace('window.__ARTICLE_PATH__ = "";', `window.__ARTICLE_PATH__ = "${articlePath}";`);
-  html = html.replace('window.__QUOTES__ = [];', `window.__QUOTES__ = ${esc(quotes)};`);
-  html = html.replace('window.__PLAYLIST__ = [];', `window.__PLAYLIST__ = ${esc(playlist)};`);
+  const treeStr = JSON.stringify({ tree }).replace(/<\//g, '<\\/');
+  const filesStr = JSON.stringify(files).replace(/<\//g, '<\\/');
+  const quotesStr = JSON.stringify(quotes).replace(/<\//g, '<\\/');
+  const playlistStr = JSON.stringify(playlist).replace(/<\//g, '<\\/');
+
+  let html = fs.readFileSync(htmlTemplate, 'utf-8');
+
+  html = html.replace('window.__TREE__ = {"tree":[]};', 'window.__TREE__ = ' + treeStr + ';');
+  html = html.replace('window.__FILES__ = {};', 'window.__FILES__ = ' + filesStr + ';');
+  html = html.replace('window.__ARTICLE_PATH__ = "";', 'window.__ARTICLE_PATH__ = "' + articlePath + '";');
+  html = html.replace('window.__QUOTES__ = [];', 'window.__QUOTES__ = ' + quotesStr + ';');
+  html = html.replace('window.__PLAYLIST__ = [];', 'window.__PLAYLIST__ = ' + playlistStr + ';');
+
   if (articlePath) {
-    const label = articlePath.replace(/^content\//, '').replace(/\.md$/, '').replace(/\/index$/, '');
-    html = html.replace('<title>安巢鸟的小站</title>', `<title>${label} - 安巢鸟的小站</title>`);
+    const articleLabel = articlePath
+      .replace(/^content\//, '')
+      .replace(/\.md$/, '')
+      .replace(/\/index$/, '');
+    html = html.replace('<title>个人博客</title>', `<title>${articleLabel} - 个人博客</title>`);
   }
+
   return html;
 }
 
+// ─── 写入文件 ───
 function writeFile(filePath, content) {
   const dir = path.dirname(filePath);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
   fs.writeFileSync(filePath, content, 'utf-8');
 }
 
 function mapOutputPath(fileKey) {
-  const relative = fileKey.replace(/^content\//, '').replace(/\/index\.md$/, '/index.html').replace(/\.md$/, '.html');
+  let relative = fileKey
+    .replace(/^content\//, '')
+    .replace(/\/index\.md$/, '/index.html')
+    .replace(/\.md$/, '.html');
   return path.join(PUBLIC, relative);
 }
 
-writeFile(DST('index.html'), buildHtml(''));
+writeFile(path.join(PUBLIC, 'index.html'), buildHtml(''));
 console.log('✅ 首页: /index.html');
 
 for (const [fileKey] of Object.entries(files)) {
@@ -94,27 +140,57 @@ for (const [fileKey] of Object.entries(files)) {
   console.log(`  📄 ${fileKey} → /${path.relative(PUBLIC, outputPath).replace(/\\/g, '/')}`);
 }
 
-// 复制资源
-function copyDir(src, dest, label) {
-  if (!fs.existsSync(src)) return;
-  fs.mkdirSync(dest, { recursive: true });
-  let count = 0;
-  for (const file of fs.readdirSync(src)) { fs.copyFileSync(path.join(src, file), path.join(dest, file)); count++; }
-  console.log(`✅ 已复制 ${count} ${label}`);
+// ─── 复制图片 ───
+if (fs.existsSync(imagesDir)) {
+  const targetImgDir = path.join(PUBLIC, 'content', 'images');
+  fs.mkdirSync(targetImgDir, { recursive: true });
+  for (const file of fs.readdirSync(imagesDir)) {
+    fs.copyFileSync(path.join(imagesDir, file), path.join(targetImgDir, file));
+  }
+  console.log(`✅ 已复制 ${fs.readdirSync(imagesDir).length} 张图片`);
 }
 
-function copyFile(src, dest, label) {
-  if (!fs.existsSync(src)) return;
-  fs.mkdirSync(path.dirname(dest), { recursive: true });
-  fs.copyFileSync(src, dest);
-  console.log(`✅ 已复制${label ? ' ' + label : ''}`);
+// ─── 复制 sw.js ───
+const swPath = path.join(ROOT, 'sw.js');
+if (fs.existsSync(swPath)) {
+  fs.copyFileSync(swPath, path.join(PUBLIC, 'sw.js'));
+  console.log('✅ 已复制 Service Worker sw.js');
 }
 
-copyDir(SRC('content/images'), DST('content/images'), '张图片');
-copyFile(SRC('sw.js'), DST('sw.js'), 'Service Worker sw.js');
-copyFile(SRC('404.html'), DST('404.html'), '404.html');
-copyFile(SRC('static/icon.png'), DST('static/icon.png'), '网站图标 icon.png');
-copyDir(SRC('static/bgv'), DST('static/bgv'), '个背景视频/图片');
-copyDir(SRC('static/bgm'), DST('static/bgm'), '首音乐');
+// ─── 复制 404 ───
+const h404Path = path.join(ROOT, '404.html');
+if (fs.existsSync(h404Path)) {
+  fs.copyFileSync(h404Path, path.join(PUBLIC, '404.html'));
+  console.log('✅ 已复制 404.html');
+}
+
+// ─── 复制 icon ───
+const iconPath = path.join(ROOT, 'static', 'icon.png');
+if (fs.existsSync(iconPath)) {
+  const targetStatic = path.join(PUBLIC, 'static');
+  if (!fs.existsSync(targetStatic)) fs.mkdirSync(targetStatic, { recursive: true });
+  fs.copyFileSync(iconPath, path.join(targetStatic, 'icon.png'));
+  console.log('✅ 已复制网站图标 icon.png');
+}
+
+// ─── 复制 bgv ───
+if (fs.existsSync(bgvDir)) {
+  const targetBgvDir = path.join(PUBLIC, 'static', 'bgv');
+  fs.mkdirSync(targetBgvDir, { recursive: true });
+  for (const file of fs.readdirSync(bgvDir)) {
+    fs.copyFileSync(path.join(bgvDir, file), path.join(targetBgvDir, file));
+  }
+  console.log(`✅ 已复制 ${fs.readdirSync(bgvDir).length} 个背景视频/图片`);
+}
+
+// ─── 复制 bgm ───
+if (fs.existsSync(bgmDir)) {
+  const targetBgmDir = path.join(PUBLIC, 'static', 'bgm');
+  fs.mkdirSync(targetBgmDir, { recursive: true });
+  for (const file of fs.readdirSync(bgmDir)) {
+    fs.copyFileSync(path.join(bgmDir, file), path.join(targetBgmDir, file));
+  }
+  console.log(`✅ 已复制 ${fs.readdirSync(bgmDir).length} 首音乐`);
+}
 
 console.log(`\n✨ 构建完成！${playlist.length} 首音乐，${quotes.length} 条引言，${Object.keys(files).length} 篇文章 + 首页`);
