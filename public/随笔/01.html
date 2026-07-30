@@ -332,41 +332,44 @@ document.querySelectorAll('.font-item').forEach(function(el){el.addEventListener
 
 // ─── 音乐播放器 ───
 var pList=window.__PLAYLIST__||[],cT=parseInt(localStorage.getItem('musicTrack')||'0'),aE=document.getElementById('bgAudio');
+var userPaused=localStorage.getItem('musicUserPaused')==='true';
 
-function loadTrack(index){
+function loadTrack(index,autoPlay){
   if(!pList.length)return;
   if(index<0)index=pList.length-1;
   if(index>=pList.length)index=0;
   cT=index;localStorage.setItem('musicTrack',cT);
-  var s=pList[cT],t=parseFloat(localStorage.getItem('musicTime')||'0'),src='/'+s.file;
+  var s=pList[cT],src='/'+s.file;
   document.getElementById('musicTitle').textContent=s.name;
   // 显示加载中
   var tb=document.getElementById('musicToggle');tb.classList.add('loading');
   aE.pause();
-  if(aE.src&&aE.src.indexOf(src)!==-1&&aE.readyState>=2){aE.currentTime=Math.min(t,aE.duration||t);aE.play().catch(function(){});tb.classList.remove('loading');updatePlayBtn();return}
+  // 切歌时重置进度
+  var savedTime=parseFloat(localStorage.getItem('musicTime_'+cT)||'0');
+  if(autoPlay===undefined)autoPlay=true;
+  if(aE.src&&aE.src.indexOf(src)!==-1&&aE.readyState>=2){aE.currentTime=Math.min(savedTime,aE.duration||savedTime);if(!userPaused&&autoPlay)aE.play().catch(function(){});tb.classList.remove('loading');updatePlayBtn();return}
   var h=aE._lh;if(h)aE.removeEventListener('loadedmetadata',h);
   aE.src=src;aE.load();
-var handler=function(){var tm=Math.min(t,aE.duration||t);aE.currentTime=tm;tb.classList.remove('loading');aE.play().catch(function(){});aE.removeEventListener('loadedmetadata',handler);aE._lh=null};
+var handler=function(){var tm=Math.min(savedTime,aE.duration||savedTime);aE.currentTime=tm;tb.classList.remove('loading');if(!userPaused&&autoPlay)aE.play().catch(function(){});aE.removeEventListener('loadedmetadata',handler);aE._lh=null};
   aE.addEventListener('loadedmetadata',handler);aE._lh=handler;
   updatePlayBtn();
 }
 function updatePlayBtn(){var b=document.getElementById('musicToggle'),c=b.querySelector('.btn-icon');if(!aE.paused&&!aE.ended){c.textContent='⏸';b.classList.add('playing')}else{c.textContent='▶️';b.classList.remove('playing')}}
-function togglePlay(){if(!pList.length)return;if(aE.paused){if(!aE.src){loadTrack(cT);return}aE.play().catch(function(){});updatePlayBtn()}else{aE.pause();updatePlayBtn()}}
-function nextTrack(){loadTrack(cT+1)}
-function prevTrack(){loadTrack(cT-1)}
-aE.addEventListener('timeupdate',function(){localStorage.setItem('musicTime',aE.currentTime)});
+function togglePlay(){if(!pList.length)return;if(aE.paused){userPaused=false;localStorage.setItem('musicUserPaused','false');if(!aE.src){loadTrack(cT,true);return}aE.play().catch(function(){});updatePlayBtn()}else{userPaused=true;localStorage.setItem('musicUserPaused','true');aE.pause();updatePlayBtn()}}
+function nextTrack(){userPaused=false;localStorage.setItem('musicUserPaused','false');localStorage.removeItem('musicTime_'+cT);loadTrack(cT+1,true)}
+function prevTrack(){userPaused=false;localStorage.setItem('musicUserPaused','false');localStorage.removeItem('musicTime_'+cT);loadTrack(cT-1,true)}
+aE.addEventListener('timeupdate',function(){if(!aE.paused)localStorage.setItem('musicTime_'+cT,aE.currentTime)});
 aE.addEventListener('play',function(){updatePlayBtn()});
 aE.addEventListener('pause',function(){updatePlayBtn()});
 var sV=parseFloat(localStorage.getItem('musicVolume')||'0.8');aE.volume=sV;document.getElementById('volumeSlider').value=sV*100;
 document.getElementById('volumeSlider').addEventListener('input',function(e){e.stopPropagation();var v=this.value/100;aE.volume=v;localStorage.setItem('musicVolume',v)});
-aE.addEventListener('ended',function(){nextTrack()});
+aE.addEventListener('ended',function(){userPaused=false;localStorage.setItem('musicUserPaused','false');localStorage.removeItem('musicTime_'+cT);nextTrack()});
 if(pList.length){
-  var _t=parseFloat(localStorage.getItem('musicTime')||'0');
   document.getElementById('musicTitle').textContent=pList[cT].name;
+  var _t=parseFloat(localStorage.getItem('musicTime_'+cT)||'0');
   if(_t>0||localStorage.getItem('musicTrack')){
-    loadTrack(cT);
-    // 浏览器可能阻止自动播放，用户需手动点击播放按钮
-    // 此时按钮显示▶️，点击后即可播放
+    loadTrack(cT,false);
+    // 有历史记录时自动加载但不播放，按钮显示▶️等待用户点击
   }
 }
 document.getElementById('musicToggle').addEventListener('click',function(e){e.stopPropagation();togglePlay()});
