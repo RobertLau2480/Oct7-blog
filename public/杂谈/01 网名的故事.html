@@ -142,9 +142,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 .markdown-body a{color:var(--accent);text-decoration:none}
 .markdown-body a:hover{text-decoration:underline}
 .markdown-body hr{border:none;border-top:1px solid var(--border);margin:24px 0}
-.markdown-body table{width:100%;border-collapse:collapse;margin:16px 0}
+.markdown-body .table-wrapper{overflow-x:auto;margin:16px 0}
+.markdown-body .table-wrapper table{margin:0}
+.markdown-body table{width:100%;border-collapse:collapse}
 .markdown-body th,.markdown-body td{border:1px solid var(--border);padding:8px 12px;text-align:left}
 .markdown-body th{background:var(--hover);font-weight:600}
+.markdown-body .katex-display{overflow-x:auto;overflow-y:hidden;padding:4px 0;max-width:100%}
+.markdown-body .katex{word-break:break-word}
+.markdown-body pre code{white-space:pre-wrap;word-break:break-word}
 .markdown-body strong{font-weight:700}
 .markdown-body .home-wrapper{max-width:720px;margin:0 auto;padding:10px 0}
 .markdown-body .home-header{text-align:center;padding:20px 0 12px}
@@ -305,7 +310,17 @@ document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 (function() { document.getElementById('themeToggle').textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙'; })();
 
 // ─── 背景 ───
-function getBgOption(){return localStorage.getItem('bgOption')||'video'}
+// 当前文章路径（用于按页面决定默认背景）
+var currentArticlePath = window.__ARTICLE_PATH__ || '';
+// 默认背景：仅主页/关于/留言用视频（图片），其他页面用中性
+function defaultBgForPath(path){
+  if (path === 'content/index.md' || path === 'content/关于.md' || path === 'content/留言.md') return 'video';
+  return 'neutral';
+}
+function getBgOption(){
+  var saved = localStorage.getItem('bgOption');
+  return saved || defaultBgForPath(currentArticlePath);
+}
 function setBgOption(opt){
   localStorage.setItem('bgOption',opt);
   document.documentElement.setAttribute('data-bg',opt==='video'?'':opt);
@@ -415,6 +430,15 @@ function navigateTo(url) {
   // 更新 URL（不刷新页面）
   history.pushState({ fileKey: fileKey }, '', url);
 
+  // 更新当前文章路径（影响默认背景选择）
+  currentArticlePath = fileKey;
+  if (!localStorage.getItem('bgOption')) {
+    var defaultOpt = defaultBgForPath(fileKey);
+    document.documentElement.setAttribute('data-bg', defaultOpt === 'video' ? '' : defaultOpt);
+    document.querySelectorAll('.bg-grid-item').forEach(function(el){el.classList.toggle('active', el.dataset.bgOption === defaultOpt)});
+    updateBackground();
+  }
+
   // 更新侧栏高亮和展开
   document.querySelectorAll('.tree-item-inner.active').forEach(function(el){el.classList.remove('active')});
   document.querySelectorAll('.tree-item .tree-arrow.open').forEach(function(el){el.classList.remove('open')});
@@ -505,6 +529,13 @@ function wikiResolve(page) {
 // 处理浏览器前进/后退
 window.addEventListener('popstate', function(e){
   if (e.state && e.state.fileKey) {
+    currentArticlePath = e.state.fileKey;
+    if (!localStorage.getItem('bgOption')) {
+      var defaultOpt = defaultBgForPath(e.state.fileKey);
+      document.documentElement.setAttribute('data-bg', defaultOpt === 'video' ? '' : defaultOpt);
+      document.querySelectorAll('.bg-grid-item').forEach(function(el){el.classList.toggle('active', el.dataset.bgOption === defaultOpt)});
+      updateBackground();
+    }
     var el = document.querySelector('[data-path="'+e.state.fileKey+'"]');
     // 不调用 navigateTo，直接恢复
     loadFile(e.state.fileKey, el);
@@ -654,43 +685,62 @@ function loadFile(path,element){
   }
   mdBody.querySelectorAll('img').forEach(function(img){img.style.cursor='zoom-in';img.addEventListener('click',function(){window.open(this.src,'_blank')})});
 
+  // ─── 表格包裹在可滚动容器中（防止移动端溢出） ───
+  mdBody.querySelectorAll('table').forEach(function(tbl){
+    if (!tbl.parentNode.classList.contains('table-wrapper')) {
+      var wrapper = document.createElement('div');
+      wrapper.className = 'table-wrapper';
+      tbl.parentNode.insertBefore(wrapper, tbl);
+      wrapper.appendChild(tbl);
+    }
+  });
+
   // ─── Obsidian Callout → 彩色框（渲染后 DOM 转换，保留内部 Markdown） ───
+  // 支持 [!type] 和 [!type]- 两种语法（- 表示可折叠，默认折叠）
   var colors = { note:'#1976d2', info:'#2196f3', tip:'#4caf50', success:'#4caf50', question:'#9c27b0', warning:'#ff9800', danger:'#f44336', caution:'#f44336', important:'#e91e63', bug:'#f44336', example:'#607d8b', quote:'#9e9e9e', abstract:'#03a9f4' };
   mdBody.querySelectorAll('blockquote').forEach(function(bq){
     var firstLine = bq.textContent.trim().split('\n')[0] || '';
-    var m = firstLine.match(/^\[!(\w+)\](.*)$/);
+    var m = firstLine.match(/^\[!(\w+)\](-)?\s*(.*)$/);
     if (m) {
-      var type = m[1].toLowerCase(), color = colors[type] || '#1976d2', title = (m[2]||'').trim() || type;
+      var type = m[1].toLowerCase(), isCollapsible = !!m[2], color = colors[type] || '#1976d2', title = (m[3]||'').trim() || type;
       // 去除第一行（[!xxx] 标题行）
       var bodyClone = bq.cloneNode(true);
       var firstChild = bodyClone.firstChild;
       while (firstChild && firstChild.nodeType === 1) { firstChild = firstChild.nextSibling; }
       if (firstChild) bodyClone.removeChild(firstChild);
       else {
-        // 移除第一个子元素的第一行文本
         var firstEl = bodyClone.querySelector('p,h1,h2,h3,ul,ol,li');
         if (firstEl) {
           var texts = firstEl.childNodes;
           for (var i = texts.length - 1; i >= 0; i--) {
-            if (texts[i].nodeType === 3 && texts[i].textContent.indexOf('[!' + m[1] + ']') !== -1) {
+            if (texts[i].nodeType === 3 && texts[i].textContent.indexOf('[!' + m[1] + ']' + (m[2]||'')) !== -1) {
               firstEl.removeChild(texts[i]);
             }
           }
           if (!firstEl.textContent.trim()) firstEl.remove();
         }
       }
-      bodyClone.innerHTML = bodyClone.innerHTML.replace(/(<[^>]*>)?\s*\[!(\w+)\]([^<]*)/, '$1');
+      bodyClone.innerHTML = bodyClone.innerHTML.replace(/(<[^>]*>)?\s*\[!(\w+)\](-)?\s*([^<]*)/, '$1');
       var div = document.createElement('div');
-      div.className = 'obsidian-callout';
-      div.style.borderLeft = '4px solid ' + color;
-      div.style.background = 'var(--blockquote-bg)';
+      div.className = 'obsidian-callout' + (isCollapsible ? ' obsidian-callout-collapsible' : '');
+      div.style.cssText = 'border-left:4px solid ' + color + ';background:var(--blockquote-bg);border-radius:4px;padding:0;margin:12px 0';
       var titleDiv = document.createElement('div');
-      titleDiv.style.cssText = 'font-weight:600;color:' + color + ';margin-bottom:4px';
-      titleDiv.textContent = title;
+      titleDiv.style.cssText = 'font-weight:600;color:' + color + ';padding:10px 14px 8px;cursor:' + (isCollapsible ? 'pointer' : 'default') + ';user-select:none';
+      titleDiv.textContent = (isCollapsible ? '▼ ' : '') + title;
       div.appendChild(titleDiv);
       var contentDiv = document.createElement('div');
+      contentDiv.style.cssText = 'padding:0 14px 10px';
       while (bodyClone.firstChild) contentDiv.appendChild(bodyClone.firstChild);
       div.appendChild(contentDiv);
+      if (isCollapsible) {
+        contentDiv.style.display = 'none';
+        titleDiv.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var isOpen = contentDiv.style.display !== 'none';
+          contentDiv.style.display = isOpen ? 'none' : 'block';
+          titleDiv.textContent = (isOpen ? '▶ ' : '▼ ') + title;
+        });
+      }
       bq.parentNode.replaceChild(div, bq);
     }
   });
