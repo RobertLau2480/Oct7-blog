@@ -97,11 +97,13 @@ function buildHtml(articlePath) {
 
   let html = fs.readFileSync(htmlTemplate, 'utf-8');
 
-  html = html.replace('window.__TREE__ = {"tree":[]};', 'window.__TREE__ = ' + treeStr + ';');
-  html = html.replace('window.__FILES__ = {};', 'window.__FILES__ = ' + filesStr + ';');
-  html = html.replace('window.__ARTICLE_PATH__ = "";', 'window.__ARTICLE_PATH__ = "' + articlePath + '";');
-  html = html.replace('window.__QUOTES__ = [];', 'window.__QUOTES__ = ' + quotesStr + ';');
-  html = html.replace('window.__PLAYLIST__ = [];', 'window.__PLAYLIST__ = ' + playlistStr + ';');
+  // 字面量替换：String.replace 会把替换串中的 $ 特殊序列（$$ $& 等）展开，破坏数学公式等数据
+  const inject = (html, placeholder, replacement) => html.split(placeholder).join(replacement);
+  html = inject(html, 'window.__TREE__ = {"tree":[]};', 'window.__TREE__ = ' + treeStr + ';');
+  html = inject(html, 'window.__FILES__ = {};', 'window.__FILES__ = ' + filesStr + ';');
+  html = inject(html, 'window.__ARTICLE_PATH__ = "";', 'window.__ARTICLE_PATH__ = "' + articlePath + '";');
+  html = inject(html, 'window.__QUOTES__ = [];', 'window.__QUOTES__ = ' + quotesStr + ';');
+  html = inject(html, 'window.__PLAYLIST__ = [];', 'window.__PLAYLIST__ = ' + playlistStr + ';');
 
   if (articlePath) {
     const articleLabel = articlePath
