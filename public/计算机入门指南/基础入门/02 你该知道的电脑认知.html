@@ -483,6 +483,25 @@ function getArticleUrl(filePath) {
   return '/' + url;
 }
 
+// 按 Obsidian 规则解析 Wiki 链接：支持文件名短名（任意目录下的同名 .md / 文件夹 index 页）
+function wikiResolve(page) {
+  var direct = 'content/' + page + '.md';
+  if (contentMap[direct]) return direct;
+  var folderIndex = 'content/' + page + '/index.md';
+  if (contentMap[folderIndex]) return folderIndex;
+  // Obsidian 短名：在整个目录树中按“文件名”匹配（同名文件不唯一时不猜测）
+  var keys = Object.keys(contentMap);
+  var found = null, count = 0;
+  for (var i = 0; i < keys.length; i++) {
+    var segs = keys[i].split('/');
+    var last = segs[segs.length - 1];
+    var isMatch = (last === page + '.md') ||
+                  (last === 'index.md' && segs.length >= 2 && segs[segs.length - 2] === page);
+    if (isMatch) { count++; found = keys[i]; }
+  }
+  return count === 1 ? found : null;
+}
+
 // 处理浏览器前进/后退
 window.addEventListener('popstate', function(e){
   if (e.state && e.state.fileKey) {
@@ -584,12 +603,13 @@ function loadFile(path,element){
   mdText = mdText.replace(/==([^=]+)==/g, '<mark>$1</mark>');
 
   // 5. 处理 Wiki 链接 [[页面]] / [[页面#标题]] / [[页面|别名]] → 内部链接
+  //    Obsidian 按“文件名短名”解析：[[01 硬件相关知识]] 可指向任意目录下的同名文章
   mdText = mdText.replace(/\[\[([^\]|!]+?)(?:#([^\]|]+?))?(?:\|([^\]]+?))?\]\]/g, function(m, page, heading, alias) {
     var label = alias || (heading ? page + ' #' + heading : page);
-    // 转成内容站点链接格式（contentMap 查找）
-    var pageFile = 'content/' + page + '.md';
+    // 转成内容站点链接格式（contentMap 查找，支持 Obsidian 短名）
+    var pageFile = wikiResolve(page);
     var url;
-    if (contentMap[pageFile]) {
+    if (pageFile) {
       url = getArticleUrl(pageFile) + (heading ? '#' + encodeURIComponent(heading) : '');
     } else {
       // 找不到页面，显示为文本
