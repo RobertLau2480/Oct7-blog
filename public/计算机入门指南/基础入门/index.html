@@ -127,6 +127,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 .content-wrapper{flex:1;overflow-y:auto;padding:40px;max-width:860px;width:100%;margin:0 auto;transition:max-width .35s ease}
 .content-wrapper::-webkit-scrollbar{width:8px}
 .content-wrapper::-webkit-scrollbar-thumb{background:var(--text-secondary);border-radius:4px}
+/* ─── 文章目录导航（桌面端右侧空白区，绝不遮挡正文） ─── */
+.toc-nav{position:fixed;top:50%;transform:translateY(-50%);width:190px;max-height:65vh;overflow-y:auto;padding:14px 16px;background:var(--sidebar-content-bg);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);font-size:14px;line-height:1.7;z-index:40;scrollbar-width:thin;transition:right .35s ease}
+.toc-nav::-webkit-scrollbar{width:4px}
+.toc-nav::-webkit-scrollbar-thumb{background:var(--text-secondary);border-radius:2px}
+.toc-nav-title{font-size:13px;font-weight:700;color:var(--text-secondary);letter-spacing:1px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.toc-nav a{display:block;color:var(--text-secondary);text-decoration:none;padding:3px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .15s,border-color .15s;border-left:3px solid transparent;padding-left:10px}
+.toc-nav a:hover{color:var(--accent)}
+.toc-nav a.toc-h2{margin-left:12px;font-size:13px}
+.toc-nav a.toc-h3{margin-left:24px;font-size:12px}
+.toc-nav a.active{color:var(--accent);font-weight:600;border-left-color:var(--accent)}
 .markdown-body{line-height:1.8;font-size:var(--font-md-body);color:var(--text)}
 .markdown-body h1{font-size:var(--font-md-h1);font-weight:700;margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid var(--border)}
 .markdown-body h2{font-size:var(--font-md-h2);font-weight:600;margin:28px 0 12px}
@@ -246,6 +256,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
       <button class="header-btn" id="menuBtn" title="菜单">⚙️</button>
     </div>
   </div>
+  <!-- 文章目录导航（桌面端右侧空白处） -->
+  <nav class="toc-nav" id="tocNav" style="display:none;">
+    <div class="toc-nav-title">📑 目录</div>
+    <div id="tocNavLinks"></div>
+  </nav>
   <div class="menu-dropdown" id="menuDropdown">
     <div class="menu-section">背景</div>
     <div class="bg-grid">
@@ -599,6 +614,108 @@ function renderTree(nodes,container,depth,parentPath){
 function getIcon(p){var n=p.split('/').pop();if(n==='关于.md')return'ℹ️';if(n==='留言.md')return'💬';if(n==='个人博客.md')return'📰';if(n==='index.md')return'🏠';return'📄'}
 function esc(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML}
 
+// ─── 右侧文章目录导航 ───
+var tocLinkItems = [];
+function buildToc(path){
+  var tocNav=document.getElementById('tocNav'),tocLinks=document.getElementById('tocNavLinks');
+  tocLinkItems = [];
+  // 排除 主页/关于/留言
+  var isExcluded = (path === 'content/index.md' || path === 'content/关于.md' || path === 'content/留言.md');
+  if (isExcluded || !tocNav || !tocLinks) {
+    if (tocNav) tocNav.style.display = 'none';
+    return;
+  }
+  // 动态检测右侧是否有足够空白放置目录（绝不遮挡正文）
+  var cw=document.getElementById('contentWrapper');
+  var mdBody=document.getElementById('markdownBody');
+  if (!cw || !mdBody) { if (tocNav) tocNav.style.display='none'; return; }
+  // 用 contentWrapper 的可见右边界判断（更准确）
+  var cwRect = cw.getBoundingClientRect();
+  var windowW = window.innerWidth;
+  // 目录 190px 宽 + 右距 20px + 安全间距 20px = 230px
+  // 只要正文右边缘到窗口右边缘的空隙 ≥ 230px 就显示，绝不遮挡
+  var minRightGap = 230;
+  var rightGap = windowW - cwRect.right;
+  if (rightGap < minRightGap) {
+    if (tocNav) tocNav.style.display='none';
+    return;
+  }
+  // 目录固定贴在窗口最右边缘（right:20px），靠右显示，绝不遮挡正文
+  tocNav.style.right = '20px';
+  var headings=mdBody.querySelectorAll('h1,h2,h3');
+  if (!headings.length) { tocNav.style.display='none'; return; }
+  tocLinks.innerHTML='';
+  headings.forEach(function(h){
+    if (!h.id) {
+      // 为标题生成 id（若无）
+      var base = (h.textContent||'').trim().replace(/\s+/g,'-').replace(/[^\w\u4e00-\u9fa5-]/g,'');
+      h.id = 'toc-' + base;
+      // 确保唯一
+      if (document.querySelectorAll('#' + CSS.escape(h.id)).length > 1) h.id = h.id + '-' + Date.now() + '-' + Math.floor(Math.random()*1000);
+    }
+    var a=document.createElement('a');
+    a.href='#'+h.id;
+    a.textContent=h.textContent.trim();
+    var level = h.tagName.toLowerCase();
+    if (level === 'h2') a.className='toc-h2';
+    else if (level === 'h3') a.className='toc-h3';
+    a.addEventListener('click',function(e){
+      e.preventDefault();
+      var target=document.getElementById(h.id);
+      if (target) {
+        var cw=document.getElementById('contentWrapper');
+        // 平滑滚动到目标位置（contentWrapper 是滚动容器）
+        var top = target.getBoundingClientRect().top + cw.scrollTop - cw.getBoundingClientRect().top - 70;
+        cw.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      }
+    });
+    tocLinks.appendChild(a);
+    tocLinkItems.push({ el: a, target: h });
+  });
+  tocNav.style.display='block';
+}
+
+// 窗口尺寸变化时重新定位/隐藏目录
+window.addEventListener('resize', function(){
+  if (currentArticlePath) buildToc(currentArticlePath);
+});
+
+// 滚动时高亮当前章节
+(function(){
+  var cw=document.getElementById('contentWrapper');
+  if (!cw) return;
+  var ticking=false;
+  cw.addEventListener('scroll',function(){
+    if (ticking) return;
+    ticking=true;
+    requestAnimationFrame(function(){
+      ticking=false;
+      if (!tocLinkItems.length) return;
+      var scrollTop=cw.scrollTop, viewportHeight=cw.clientHeight;
+      var current=null;
+      // 找到当前视口中最靠上的标题
+      for (var i=0;i<tocLinkItems.length;i++){
+        var item=tocLinkItems[i];
+        if (!item.target) continue;
+        var rect=item.target.getBoundingClientRect();
+        if (rect.top <= 100 && rect.top + rect.height > 0) current=item;
+        else if (rect.top > 100) break;
+      }
+      // 如果没有任何标题位于视口上方区域，用最后一个在视口内的
+      if (!current) {
+        for (var j=0;j<tocLinkItems.length;j++){
+          var it=tocLinkItems[j];
+          if (!it.target) continue;
+          var r=it.target.getBoundingClientRect();
+          if (r.top < viewportHeight) current=it;
+          else break;
+        }
+      }
+      tocLinkItems.forEach(function(it){ it.el.classList.toggle('active', it === current); });
+    });
+  });
+})();
+
 function loadFile(path,element){
   document.querySelectorAll('.tree-item-inner.active').forEach(function(el){el.classList.remove('active')});
   if(element)element.classList.add('active');
@@ -818,6 +935,8 @@ function loadFile(path,element){
       gc.appendChild(sc);
     }
   }
+  // ─── 生成右侧文章目录导航 ───
+  buildToc(path);
   if(quotesData.length>0){var qe=mdBody.querySelector('.random-quote');if(qe&&qe.textContent.indexOf('正在加载')!==-1){var idx=Math.floor(Math.random()*quotesData.length);var q=quotesData[idx];qe.textContent='「 '+q.text+' 」'}}
   var label=element?element.querySelector('span:last-child').textContent:'';
   document.getElementById('desktopTitle').textContent='📝 '+(label||'个人博客');
@@ -864,6 +983,8 @@ function filterTree(q){
   if(window.innerWidth>768&&localStorage.getItem('sidebarHidden')==='true') setSidebarState(true);
   toggle.addEventListener('click',function(){
     setSidebarState(sidebar.classList.contains('hidden')?false:true);
+    // 侧栏切换后重新定位目录
+    setTimeout(function(){ if (currentArticlePath) buildToc(currentArticlePath); }, 350);
   });
   // 窗口尺寸变化时，移动端自动移除 hidden
   window.addEventListener('resize',function(){
