@@ -61,8 +61,8 @@ html{transition:color-scheme .25s}
 .search-box{background:var(--content-bg)}
 .overlay{display:none;position:fixed;inset:0;background:var(--overlay-bg);z-index:50}
 .overlay.show{display:block}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif;color:var(--text);height:100vh;display:flex;overflow:hidden;position:relative}
-.sidebar{width:var(--sidebar-width);min-width:var(--sidebar-width);height:100vh;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:100;transition:width .35s ease,min-width .35s ease,border-color .35s ease}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif;color:var(--text);height:calc(var(--vh,1vh)*100);height:100dvh;display:flex;overflow:hidden;position:relative}
+.sidebar{width:var(--sidebar-width);min-width:var(--sidebar-width);height:calc(var(--vh,1vh)*100);height:100dvh;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:100;transition:width .35s ease,min-width .35s ease,border-color .35s ease}
 @media(min-width:769px){.sidebar.hidden{width:0;min-width:0;border-right-color:transparent;overflow:hidden}}
 .sidebar-header{padding:20px;border-bottom:1px solid var(--border);cursor:pointer}
 .sidebar-header h1{font-size:20px;font-weight:700;color:var(--accent)}
@@ -599,10 +599,17 @@ function loadFile(path,element){
   // 3. Callout 语法保留为标准 blockquote（marked 渲染后再 DOM 转换）
   // 这一步不需要替换——在 marked.parse 之后处理
 
-  // 4. 处理高亮 ==text== → <mark>
+  // 4. 预处理行内 Markdown 语法（在 marked 解析前转换为 HTML）
+  //    解决 HTML 与 Markdown 混写时，语法被 HTML 块吞掉的问题
+  //    顺序：**bold** → *italic*，避免 * 与 ** 冲突
+  mdText = mdText.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  mdText = mdText.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  mdText = mdText.replace(/~~(.+?)~~/g, '<del>$1</del>');
+
+  // 5. 处理高亮 ==text== → <mark>
   mdText = mdText.replace(/==([^=]+)==/g, '<mark>$1</mark>');
 
-  // 5. 处理 Wiki 链接 [[页面]] / [[页面#标题]] / [[页面|别名]] → 内部链接
+  // 6. 处理 Wiki 链接 [[页面]] / [[页面#标题]] / [[页面|别名]] → 内部链接
   //    Obsidian 按“文件名短名”解析：[[01 硬件相关知识]] 可指向任意目录下的同名文章
   mdText = mdText.replace(/\[\[([^\]|!]+?)(?:#([^\]|]+?))?(?:\|([^\]]+?))?\]\]/g, function(m, page, heading, alias) {
     var label = alias || (heading ? page + ' #' + heading : page);
