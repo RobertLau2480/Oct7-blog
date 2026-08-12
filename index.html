@@ -52,7 +52,9 @@ html{transition:color-scheme .25s}
 .bg-blur-overlay{position:fixed;inset:0;z-index:-2;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .bg-edge-overlay{position:fixed;inset:0;z-index:-1;pointer-events:none;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);background:var(--edge-blur-color)}
 .bg-edge-overlay.home{background:rgba(255,255,255,.55)}
+.bg-edge-overlay.deep{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);background:rgba(255,255,255,.8)}
 [data-theme="dark"] .bg-edge-overlay.home{background:rgba(0,0,0,.55)}
+[data-theme="dark"] .bg-edge-overlay.deep{background:rgba(0,0,0,.8)}
 .sidebar,.main-header,.menu-dropdown,.content-wrapper{background:var(--content-bg)}
 .content-wrapper.transparent{background:transparent}
 .sidebar{background:var(--sidebar-content-bg)}
@@ -340,11 +342,16 @@ function setBgOption(opt){
   document.documentElement.setAttribute('data-bg',opt==='video'?'':opt);
   document.querySelectorAll('.bg-grid-item').forEach(function(el){el.classList.toggle('active',el.dataset.bgOption===opt)});
   updateBackground();
-  // 切换背景时同步主页遮罩
+  // 切换背景时同步遮罩（根据当前页面选择 home 或 deep）
   var cw=document.getElementById('contentWrapper'),eo=document.querySelector('.bg-edge-overlay');
-  if(cw&&cw.classList.contains('transparent')){
-    if(opt==='video'&&eo)eo.classList.add('home');
-    else if(eo)eo.classList.remove('home');
+  if(cw&&cw.classList.contains('transparent')&&eo){
+    eo.classList.remove('home');
+    eo.classList.remove('deep');
+    if(opt==='video'&&getBgOption()==='video'){
+      var isRoot = (currentArticlePath === 'content/index.md');
+      if(isRoot) eo.classList.add('home');
+      else eo.classList.add('deep');
+    }
   }
 }
 function updateBackground(){
@@ -773,10 +780,18 @@ function loadFile(path,element){
   var mdText=contentMap[path];
   if(!mdText){document.getElementById('markdownBody').innerHTML='<p style="color:#d32f2f;">❌ 文章内容未找到</p>';return}
   // 所有页面默认使用视频背景，正文透明 + 遮罩
+  // content 根目录下的页面（content/index.md）用浅遮罩，子目录页面用深遮罩
   var cw=document.getElementById('contentWrapper'),eo=document.querySelector('.bg-edge-overlay');
   cw.classList.add('transparent');
-  if(eo&&getBgOption()==='video')eo.classList.add('home');
-  else if(eo)eo.classList.remove('home');
+  var isRootPage = (path === 'content/index.md');
+  if(eo){
+    eo.classList.remove('home');
+    eo.classList.remove('deep');
+    if(getBgOption()==='video'){
+      if(isRootPage) eo.classList.add('home');
+      else eo.classList.add('deep');
+    }
+  }
 
   document.getElementById('emptyState').style.display='none';
   var mdBody=document.getElementById('markdownBody');mdBody.style.display='block';
@@ -1027,10 +1042,14 @@ function filterTree(q){
     }
   }
   // 从 localStorage 恢复（仅桌面端）
-  // 初始化主页遮罩（视频模式）
+  // 初始化遮罩（视频模式，根据当前页面选择 home 或 deep）
   (function(){
     var eo=document.querySelector('.bg-edge-overlay'),cw=document.getElementById('contentWrapper');
-    if(cw.classList.contains('transparent')&&getBgOption()==='video'&&eo)eo.classList.add('home');
+    if(cw.classList.contains('transparent')&&getBgOption()==='video'&&eo){
+      var isRoot = (currentArticlePath === 'content/index.md');
+      if(isRoot) eo.classList.add('home');
+      else eo.classList.add('deep');
+    }
   })();
   // 非桌面端跳过侧栏隐藏恢复
   if(window.innerWidth>768&&localStorage.getItem('sidebarHidden')==='true') setSidebarState(true);
