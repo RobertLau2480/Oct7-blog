@@ -20,7 +20,7 @@
 
 <div class="card-grid">
 
-<a href="/目录1/index.html" class="glass-card">
+<a href="/目录1/" class="glass-card">
 <div class="card-icon">📚</div>
 <div class="card-title">目录1</div>
 <div class="card-desc">description</div>
