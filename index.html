@@ -551,10 +551,15 @@ document.addEventListener('click', function(e){
   if (href && !href.startsWith('http') && !href.startsWith('//') && !href.startsWith('#') && !href.startsWith('mailto:')) {
     // 确保以 / 开头，且是本站页面
     var normalized = href.startsWith('/') ? href : '/' + href;
-    // 补上 .html 后缀（如 /个人博客 → /个人博客.html）
-    if (!normalized.includes('.')) normalized += '.html';
-    // 检查是不是 contentMap 中的有效页面
-    var testKey = 'content/' + normalized.replace(/^\//,'').replace(/\.html$/,'') + '.md';
+    // 保留目录末尾的 /，否则补上 .html 后缀
+    if (!normalized.includes('.') && !normalized.endsWith('/')) normalized += '.html';
+    // 目录页面映射为 content/.../index.md
+    var testKey;
+    if (normalized.endsWith('/')) {
+      testKey = 'content/' + normalized.replace(/^\//,'').replace(/\/$/,'') + '/index.md';
+    } else {
+      testKey = 'content/' + normalized.replace(/^\//,'').replace(/\.html$/,'') + '.md';
+    }
     if (contentMap[testKey]) {
       e.preventDefault();
       navigateTo(normalized);
@@ -570,8 +575,11 @@ document.getElementById('treeWrapper').addEventListener('click', function(e){
 });
 
 function getArticleUrl(filePath) {
-  var url = filePath.replace(/^content\//,'').replace(/\/index\.md$/,'/index.html').replace(/\.md$/,'.html');
-  return '/' + url;
+  if (filePath === 'content/index.md') return '/';
+  if (filePath.endsWith('/index.md')) {
+    return '/' + filePath.replace(/^content\//,'').replace(/\/index\.md$/,'/') ;
+  }
+  return '/' + filePath.replace(/^content\//,'').replace(/\.md$/,'.html');
 }
 
 // 按 Obsidian 规则解析 Wiki 链接：支持文件名短名（任意目录下的同名 .md / 文件夹 index 页）
@@ -654,7 +662,7 @@ function renderTree(nodes,container,depth,parentPath){
       inner.innerHTML='<span class="tree-arrow">▶</span><span class="tree-icon">📁</span><span>'+esc(node.name)+'</span>';
       var arrow=inner.querySelector('.tree-arrow');
       arrow.addEventListener('click',function(e){e.stopPropagation();this.classList.toggle('open');item.querySelector('.tree-children').classList.toggle('open')});
-      inner.addEventListener('click',function(e){e.stopPropagation();navigateTo(folderPath+'/index.html')});
+      inner.addEventListener('click',function(e){e.stopPropagation();navigateTo(folderPath+'/')});
       item.appendChild(inner);
       var ch=document.createElement('div');ch.className='tree-children';renderTree(node.children||[],ch,depth+1,folderPath);item.appendChild(ch);
     } else {
