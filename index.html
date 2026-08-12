@@ -392,10 +392,21 @@ function loadTrack(index,autoPlay){
   // 切歌时重置进度
   var savedTime=parseFloat(localStorage.getItem('musicTime_'+cT)||'0');
   if(autoPlay===undefined)autoPlay=true;
-  if(aE.src&&aE.src.indexOf(src)!==-1&&aE.readyState>=2){aE.currentTime=Math.min(savedTime,aE.duration||savedTime);if(!userPaused&&autoPlay)aE.play().catch(function(){});tb.classList.remove('loading');updatePlayBtn();return}
+  if(aE.src&&aE.src.indexOf(src)!==-1&&aE.readyState>=2){
+    aE.currentTime=Math.min(savedTime,aE.duration||savedTime);
+    if(!userPaused&&autoPlay){
+      var _p1=aE.play();if(_p1)_p1.catch(function(){});
+    }
+    tb.classList.remove('loading');updatePlayBtn();return;
+  }
   var h=aE._lh;if(h)aE.removeEventListener('loadedmetadata',h);
   aE.src=src;aE.load();
-var handler=function(){var tm=Math.min(savedTime,aE.duration||savedTime);aE.currentTime=tm;tb.classList.remove('loading');if(!userPaused&&autoPlay)aE.play().catch(function(){});aE.removeEventListener('loadedmetadata',handler);aE._lh=null};
+  // 立即尝试播放（保留用户手势上下文，确保首次点击能播放）
+  if(!userPaused&&autoPlay){
+    var _playPromise = aE.play();
+    if(_playPromise) _playPromise.catch(function(){});
+  }
+var handler=function(){var tm=Math.min(savedTime,aE.duration||savedTime);aE.currentTime=tm;tb.classList.remove('loading');aE.removeEventListener('loadedmetadata',handler);aE._lh=null;updatePlayBtn()};
   aE.addEventListener('loadedmetadata',handler);aE._lh=handler;
   updatePlayBtn();
 }
