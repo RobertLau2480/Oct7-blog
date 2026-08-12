@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>安巢鸟的小站</title>
+<title>OctSeventh 的 Blog</title>
 <link rel="icon" type="image/png" href="/static/icon.png">
 </head>
 <body>
@@ -238,8 +238,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-header" id="sidebarHeader">
-    <h1>安巢鸟的小站</h1>
-    <p>HomewardBird's Site</p>
+    <h1>OctSeventh 的 Blog</h1>
+    <p>OctSeventh's Blog</p>
   </div>
   <input class="search-box" id="searchBox" type="text" placeholder="搜索文章..." oninput="filterTree(this.value)">
   <div class="tree-wrapper" id="treeWrapper"></div>
@@ -249,8 +249,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
   <div class="main-header">
     <button class="hamburger" id="hamburgerBtn">☰</button>
     <button class="sidebar-toggle" id="sidebarToggle" title="切换侧栏">⇐</button>
-    <span class="desktop-title" id="desktopTitle">安巢鸟的小站</span>
-    <span id="mobileTitle" style="font-size:15px;font-weight:600;color:var(--text);display:none;">安巢鸟的小站</span>
+    <span class="desktop-title" id="desktopTitle">OctSeventh 的 Blog</span>
+    <span id="mobileTitle" style="font-size:15px;font-weight:600;color:var(--text);display:none;">OctSeventh 的 Blog</span>
     <div class="header-actions">
       <button class="header-btn" id="themeToggle" title="切换深浅色模式">🌙</button>
       <button class="header-btn" id="menuBtn" title="菜单">⚙️</button>
@@ -482,10 +482,10 @@ function navigateTo(url) {
   }
 
   // 更新标题
-  var label = '安巢鸟的小站';
+  var label = 'OctSeventh 的 Blog';
   if (fileKey !== 'content/index.md') {
     var n = fileKey.replace(/^content\//,'').replace(/\.md$/,'').replace(/\/index$/,'');
-    label = n + ' - 安巢鸟的小站';
+    label = n + ' - OctSeventh 的 Blog';
   }
   document.title = label;
 }
@@ -928,7 +928,7 @@ function loadFile(path,element){
     if(!document.getElementById('giscus-script')){
       var dk=document.documentElement.getAttribute('data-theme')==='dark';
       var sc=document.createElement('script');sc.id='giscus-script';sc.src='https://giscus.app/client.js';
-      sc.setAttribute('data-repo','HomewardBird/First_single_blog');sc.setAttribute('data-repo-id','R_kgDOTbNa5g');sc.setAttribute('data-category','Announcements');
+      sc.setAttribute('data-repo','RobertLau2480/Oct7-blog');sc.setAttribute('data-repo-id','');sc.setAttribute('data-category','Announcements');
       sc.setAttribute('data-category-id','DIC_kwDOTbNa5s4DBg2M');sc.setAttribute('data-mapping','pathname');sc.setAttribute('data-strict','0');
       sc.setAttribute('data-reactions-enabled','1');sc.setAttribute('data-emit-metadata','0');sc.setAttribute('data-input-position','top');
       sc.setAttribute('data-theme',dk?'dark':'light');sc.setAttribute('data-lang','zh-CN');sc.setAttribute('crossorigin','anonymous');sc.async=true;

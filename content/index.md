@@ -1,8 +1,6 @@
-
-
 <div class="home-wrapper">
 <header class="home-header">
-<h1 class="site-title">安巢鸟的个人网站 <span style="font-size: 1.1rem"> HomewardBird's Site</span></h1>
+<h1 class="site-title">OctSeventh 的 Blog <span style="font-size: 1.1rem"> OctSeventh's Blog</span></h1>
 
 <i><p class="random-quote" id="random-quote">「 正在加载... 」</p></i>
 <span style="font-size: 0.1rem"><br></span>
@@ -10,9 +8,10 @@
 
 <section class="author-words">
 <p>
-站主不太会说漂亮话，欢迎你们的到来<br>
-功能都集中在上方菜单栏中，若体验有问题请来联系站长<br>
-音乐的话可以播放十首歌（站长不太听轻音乐，有推荐的可以写邮箱或私信站长B站安巢鸟）
+欢迎来到 OctSeventh 的博客小站<br>
+这里记录着我的一些思考、学习笔记与生活碎片<br>
+所有功能都集中在顶部菜单栏中，若有任何问题或建议，欢迎随时留言联系<br>
+希望这个小站能带给你一些启发或片刻的宁静
 <br>
 <br>
 
@@ -23,7 +22,7 @@
 <a href="/个人博客" class="glass-card">
 <div class="card-icon">📚</div>
 <div class="card-title">个人博客</div>
-<div class="card-desc">我这人成分复杂，啥都写点</div>
+<div class="card-desc">记录学习、思考与日常的点滴</div>
 <div class="card-preview">
 <div class="card-preview-item">💻 计算机入门指南</div>
 <div class="card-preview-item">🍃 随笔</div>
@@ -50,7 +49,6 @@
 </div>
 
 <div class="friend-link">
-  Oct7 的网站：<a href="https://octseven.us.kg/">octseven.us.kg</a>
+  OctSeventh 的网站：<a href="https://octseven.us.kg/">octseven.us.kg</a>
 </div>
 </div>
-

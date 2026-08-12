@@ -1,4 +1,4 @@
-# 安巢鸟的小站
+# OctSeventh 的 Blog
 
 基于 Cloudflare Pages 部署的纯静态个人博客系统。Markdown 写作，自动构建，单页应用导航确保音乐播放不中断。
 
