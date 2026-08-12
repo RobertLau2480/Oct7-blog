@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OctSeventh 的 Blog</title>
+<title>Oct7's Blog</title>
 <link rel="icon" type="image/png" href="/static/icon.png">
 </head>
 <body>
-<script>window.__TREE__ = {"tree":[{"name":"index.md","type":"file","path":"content/index.md","label":"首页"},{"name":"目录1","type":"folder","children":[]}]};</script>
-<script>window.__FILES__ = {"content/index.md":"<div class=\"home-wrapper\">\n<header class=\"home-header\">\n<h1 class=\"site-title\">孟冬初柒的博客 <span style=\"font-size: 1.1rem\"> OctSeventh's Blog<\/span><\/h1>\n\n<i><p class=\"random-quote\" id=\"random-quote\">「 正在加载... 」<\/p><\/i>\n<span style=\"font-size: 0.1rem\"><br><\/span>\n<\/header>\n\n<section class=\"author-words\">\n<p>\n欢迎来到 Oct7 的博客<br>\n这里暂时不放东西。<br><br><i>\n这个项目源于一场重构，不过以 维持原判 而结束。<br>\n它本该被丢进垃圾堆，但我还是决定把它捡起来。<br><\/i>\n<br>\n<br>\n\n<\/p>\n<\/section>\n\n<div class=\"card-grid\">\n\n<a href=\"/目录1/index.html\" class=\"glass-card\">\n<div class=\"card-icon\">📚<\/div>\n<div class=\"card-title\">目录1<\/div>\n<div class=\"card-desc\">description<\/div>\n<div class=\"card-preview\">\n<div class=\"card-preview-item\">💻 text1<\/div>\n<div class=\"card-preview-item\">🍃 text2<\/div>\n<\/div>\n<\/a>\n\n<\/div>\n\n<div class=\"friend-link\">\n  OctSeventh 的主站：<a href=\"https://octseven.us.kg/\">octseven.us.kg<\/a>\n<\/div>\n<\/div>","content/目录1/index.md":"# 目录1\r\n\r\n这里是 OctSeventh 的博客内容目录。\r\n\r\n## 文章列表\r\n\r\n- 暂无文章，敬请期待..."};</script>
-<script>window.__ARTICLE_PATH__ = "content/目录1/index.md";</script>
+<script>window.__TREE__ = {"tree":[{"name":"index.md","type":"file","path":"content/index.md","label":"首页"},{"name":"示例文档","type":"folder","children":[{"name":"1 博客写作示例.md","type":"file","path":"content/示例文档/1 博客写作示例.md","label":"1 博客写作示例"},{"name":"2 流程图和时序图示例.md","type":"file","path":"content/示例文档/2 流程图和时序图示例.md","label":"2 流程图和时序图示例"}]},{"name":"关于项目.md","type":"file","path":"content/关于项目.md","label":"关于项目"}]};</script>
+<script>window.__FILES__ = {"content/index.md":"<div class=\"home-wrapper\">\n<header class=\"home-header\">\n<h1 class=\"site-title\">孟冬初柒的博客 <span style=\"font-size: 1.1rem\"> Oct7's Blog<\/span><\/h1>\n\n<i><p class=\"random-quote\" id=\"random-quote\">「 正在加载... 」<\/p><\/i>\n<span style=\"font-size: 0.1rem\"><br><\/span>\n<\/header>\n\n<section class=\"author-words\">\n<p>\n欢迎来到 Oct7's Blog<br>\n这里暂时没有实质内容。<br><br><i>\n此项目源于一场重构，不过最终未得采纳。<br>\n毕竟烧了我20块钱API，所以还是决定把它捡起来。<br>\n欢迎拿去使用。<br><\/i>\n<br>\n<br>\n\n<\/p>\n<\/section>\n\n<div class=\"card-grid\">\n\n<a href=\"/示例文档/\" class=\"glass-card\">\n<div class=\"card-icon\">📚<\/div>\n<div class=\"card-title\">查看示例文档<\/div>\n<div class=\"card-desc\">支持Markdown<\/div>\n<div class=\"card-preview\">\n<div class=\"card-preview-item\">📃 文章<\/div>\n<div class=\"card-preview-item\">🍃 流程图 时序图<\/div>\n<\/div>\n<\/a>\n\n<a href=\"/404.html\" class=\"glass-card\">\n<div class=\"card-icon\">🛑<\/div>\n<div class=\"card-title\">404页面<\/div>\n<div class=\"card-desc\">HTTP 404 ERROR<\/div>\n<div class=\"card-preview\">\n<div class=\"card-preview-item\">↩️ 支持返回<\/div>\n<\/div>\n<\/a>\n\n<a href=\"https://github.com/RobertLau2480/Oct7-blog\" class=\"glass-card\">\n<div class=\"card-icon\">💼<\/div>\n<div class=\"card-title\">GitHub项目地址<\/div>\n<div class=\"card-desc\">内容开源，欢迎fork<\/div>\n<div class=\"card-preview\">\n<div class=\"card-preview-item\">💻 位于neo-str分支<\/div>\n<\/div>\n<\/a>\n\n<\/div>\n\n<div class=\"friend-link\">\n  OctSeventh 的主站：<a href=\"https://octseven.us.kg/\">octseven.us.kg<\/a>\n<\/div>\n<\/div>","content/关于项目.md":"# 关于项目\r\n\r\n本项目是一个纯静态个人博客系统，核心目标是让 Markdown 内容在构建阶段直接打包到静态 HTML 中，浏览时无需额外调用文章接口，同时提供 SPA 体验和持续播放的背景音乐。\r\n\r\n## 项目架构概览\r\n\r\n- `content/`：所有文章源文件，使用 Markdown 编写。\r\n- `static/`：静态资源目录，包括背景音乐、背景视频、图标和首页引言。\r\n- `scripts/build.js`：构建脚本，将 `content/` 和 `static/` 中的数据注入到 `index.html` 模板，生成完整的 `public/` 输出目录。\r\n- `scripts/serve.js`：本地预览服务，方便开发时查看构建结果。\r\n- `public/`：构建结果目录，包含可直接部署的静态站点文件。\r\n- `index.html`：页面模板与前端逻辑入口，运行时负责目录渲染、文章展示、主题切换、Giscus 评论等功能。\r\n\r\n## 构建流程\r\n\r\n构建过程中，`build.js` 会执行以下步骤：\r\n\r\n1. 递归读取 `content/` 下的 Markdown 文件，生成目录树和文章内容映射。\r\n2. 读取 `static/quotes.json` 作为首页随机引言。\r\n3. 扫描 `static/bgm/` 生成背景音乐播放列表。\r\n4. 将上述数据注入 `index.html` 模板，生成独立的 `public/` 页面。\r\n5. 复制 `static/` 下的资源、`sw.js`、`404.html` 等文件到 `public/`。\r\n\r\n最终生成的 `public/` 是一个完整的静态站点，浏览器访问时只需加载该目录下的文件即可。\r\n\r\n## 运行原理\r\n\r\n- 站点加载后，前端通过内嵌的 `window.__TREE__` 渲染左侧目录。\r\n- 文章内容通过 `window.__FILES__` 获取，并在页面内部渲染为 HTML。\r\n- 内部链接采用 SPA 路由，使用 `history.pushState` 进行文章切换，避免整页刷新。\r\n- 背景音乐播放器使用单个 `<audio>` 元素，跨文章切换保持播放状态。\r\n- 主题、背景、字体大小等用户设置保存在 `localStorage`，在刷新后自动恢复。\r\n\r\n## 技术选型\r\n\r\n- HTML + CSS：页面结构与样式。\r\n- 原生 JavaScript：实现所有交互逻辑，无框架依赖。\r\n- `marked.js`：将 Markdown 转换为 HTML。\r\n- `mermaid`：渲染流程图与时序图。\r\n- `KaTeX`：渲染数学公式。\r\n- `Giscus`：提供评论区，基于 GitHub Discussions。\r\n- Service Worker：缓存静态资源，提升加载性能。\r\n\r\n## GitHub 仓库\r\n\r\n项目源码托管在 GitHub：\r\n\r\nhttps://github.com/RobertLau2480/Oct7-blog\r\n\r\n欢迎 fork、使用和改进。\r\n\r\n## 部署方式\r\n\r\n推荐的部署方式是将 `public/` 目录作为静态站点根目录部署到 Cloudflare Pages 或其他静态托管服务。\r\n\r\n构建命令：\r\n\r\n```bash\r\nnode scripts/build.js\r\n```\r\n\r\n输出目录：\r\n\r\n```\r\npublic/\r\n```\r\n\r\n---\r\n\r\n如果你想进一步了解项目实现细节，可以查看 `scripts/build.js` 的构建逻辑，以及 `index.html` 中负责页面渲染与交互的主脚本。","content/示例文档/1 博客写作示例.md":"# 博客写作示例\r\n\r\n欢迎来到这篇示例文章。本文用于演示本博客系统中常见的写作格式与功能。\r\n\r\n## 你可以在这里写：\r\n\r\n- 文章标题\r\n- 简洁的小结\r\n- 代码片段\r\n- 表格与列表\r\n- 引用与提示框\r\n- Mermaid 图和数学公式\r\n\r\n## Markdown 基础语法\r\n\r\n- **加粗**、*斜体*、~~删除线~~\r\n- 表格、列表、引用\r\n\r\n| 功能 | 支持情况 |\r\n|------|----------|\r\n| 流程图 | ✅ |\r\n| 时序图 | ✅ |\r\n| 数学公式 | ✅ |\r\n| Obsidian 语法 | ✅ |\r\n\r\n## 示例内容\r\n\r\n> 这是一个引用块，用于强调重要内容。\r\n\r\n### 代码块示例\r\n\r\n```js\r\nfunction greet(name) {\r\n  return `你好，${name}！`;\r\n}\r\nconsole.log(greet('读者'));\r\n```\r\n\r\n### 表格示例\r\n\r\n| 功能 | 支持情况 |\r\n|------|----------|\r\n| 代码块 | ✅ |\r\n| 表格 | ✅ |\r\n| 引用 | ✅ |\r\n| Mermaid 图 | ✅ |\r\n| 数学公式 | ✅ |\r\n\r\n## 提示与注意\r\n\r\n> [!tip]\r\n> 你可以使用自定义提示框来展示重要建议、操作步骤或注意事项。\r\n\r\n## Mermaid 流程图示例\r\n\r\n```mermaid\r\nflowchart LR\r\n  A[开始] --> B{是否喜欢写博客？}\r\n  B -- 是 --> C[继续写作 📚]\r\n  B -- 否 --> D[休息一下 ☕]\r\n  C --> E[发表文章 ✅]\r\n  D --> E\r\n```\r\n\r\n## 数学公式示例\r\n\r\n行内公式：$a^2 + b^2 = c^2$。\r\n\r\n块级公式：\r\n\r\n$$\r\n\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}\r\n$$\r\n\r\n## 结语\r\n\r\n这篇示例文章展示了本博客支持的基本写作格式和功能。你可以在自己的文章中自由组合这些元素，打造结构清晰、可读性强的内容。\r\n","content/示例文档/2 流程图和时序图示例.md":"# 流程图与时序图示例\n\n本文展示博客对 **Mermaid 流程图**、**时序图** 以及 **数学公式** 的支持。\n\n## 流程图\n\n> [!tip] 提示\n> 流程图使用 ` ```mermaid ` 代码块编写，支持 `graph`、`flowchart` 等关键字。\n\n```mermaid\nflowchart TD\n    A[开始] --> B{是否周末？}\n    B -- 是 --> C[睡懒觉 🛏️]\n    B -- 否 --> D[起床搬砖 💼]\n    C --> E[出门玩 🎮]\n    D --> F[下班回家 🏠]\n    E --> G[结束]\n    F --> G\n```\n\n## 时序图\n\n> [!info] 说明\n> 时序图用于描述对象之间的消息交互顺序。\n\n```mermaid\nsequenceDiagram\n    participant 用户 as 👤 用户\n    participant 浏览器 as 🌐 浏览器\n    participant 服务器 as 🖥️ 服务器\n    participant 数据库 as 🗄️ 数据库\n\n    用户->>浏览器: 点击文章链接\n    浏览器->>服务器: GET /文章.html\n    服务器->>数据库: 查询文章内容\n    数据库-->>服务器: 返回 Markdown\n    服务器-->>浏览器: 返回完整 HTML\n    浏览器-->>用户: 渲染页面（SPA 不刷新）\n```\n","content/示例文档/index.md":"# 示例文档\r\n\r\n这里展示本博客的写作示例与演示文档。\r\n\r\n- <a href=\"/示例文档/1 博客写作示例.html\">1 博客写作示例<\/a>\r\n- <a href=\"/示例文档/2 流程图和时序图示例.html\">2 流程图和时序图示例<\/a>\r\n\r\n欢迎查看以上示例，体验本博客的 Markdown 语法和功能支持。"};</script>
+<script>window.__ARTICLE_PATH__ = "content/示例文档/1 博客写作示例.md";</script>
 <script>window.__QUOTES__ = [{"text":"我们终将迷失在时间的洪流中，唯有此刻的清醒属于自己。","source":"奥古斯丁"},{"text":"所有的大人都曾稚嫩，但岁月总会偷走一些记忆。","source":"圣埃克苏佩里"},{"text":"人可以被碾碎，但无法被征服。","source":"海明威"},{"text":"与其在人群中迷失，不如在孤独中圆满。","source":"尼采"},{"text":"世界以痛吻我，我却报以诗行。","source":"泰戈尔"},{"text":"勇气的赞歌，就是人类存在的证明。","source":"荒木飞吕彦"},{"text":"因为你，我愿与全世界为敌。","source":"《龙族》"},{"text":"愿我拥有宁静，接受无法改变的；拥有勇气，改变能够改变的；拥有智慧，知晓二者之别。","source":"尼布尔"},{"text":"每次跌倒，都为下一次站起积蓄力量。","source":"爱迪生"},{"text":"你的本色不在黑白之间，而在灰烬中闪烁的微光。","source":"《命运石之门》"},{"text":"剑本无心，杀意由人。","source":"《浪客剑心》"},{"text":"若方向已错，止步即是进步。","source":"古龙"},{"text":"人活一世，总有些东西比命更重。","source":"《三体》"},{"text":"世上只有一种英雄主义：在洞悉生活真相后，依然深爱它。","source":"罗曼·罗兰"},{"text":"愿你在困顿中，仍记得自己的光芒，抵御一切灰暗。","source":"《无问西东》"},{"text":"我唯一清楚的，是我的无知。","source":"苏格拉底"},{"text":"真正的智者，永葆学徒的谦卑。","source":"《英雄联盟》"},{"text":"生命可自由舒展，不可随波逐流。","source":"宫崎骏"},{"text":"有些鸟天生属于天空，它的羽毛再密也关不住。","source":"《肖申克的救赎》"},{"text":"人生无常，下一口甜苦未知。","source":"《阿甘正传》"},{"text":"道生一，一生二，二生三，三生万物。","source":"《道德经》"},{"text":"我思，故我在。","source":"笛卡尔"},{"text":"代码如诗行，架构似画卷。","source":"网络"},{"text":"愿你历尽千帆，归来仍是少年。","source":"网络"},{"text":"天道刚健，君子以自强不息。","source":"《周易》"},{"text":"求知若渴，虚心若愚。","source":"史蒂夫·乔布斯"},{"text":"深渊之下，亦是万里前程。","source":"木心"},{"text":"一切终将明朗，城南花已开。","source":"网络"},{"text":"世人捡拾六便士，他却独望月华。","source":"毛姆"},{"text":"心向所往，素履以往；生如逆旅，一苇以航。","source":"七堇年"}];</script>
 <script>window.__PLAYLIST__ = [{"name":"Beautiful World","file":"static/bgm/Beautiful World.mp3"},{"name":"BIRDS OF A FEATHER","file":"static/bgm/BIRDS OF A FEATHER.mp3"},{"name":"Skyland","file":"static/bgm/Skyland.mp3"},{"name":"Skyscape","file":"static/bgm/Skyscape.mp3"},{"name":"Time to Pretend","file":"static/bgm/Time to Pretend.mp3"},{"name":"манго нектар","file":"static/bgm/манго нектар.mp3"}];</script>
 
@@ -192,7 +192,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 .markdown-body .glass-card .card-preview{justify-content:flex-start}
 }
 /* ─── 回到顶部按钮 ─── */
-.top-btn{position:absolute;bottom:24px;right:24px;width:42px;height:42px;border-radius:50%;background:var(--bg);color:var(--text-secondary);font-size:18px;font-weight:700;line-height:42px;text-align:center;cursor:pointer;z-index:10;box-shadow:0 2px 10px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease,background .25s ease,color .25s ease;user-select:none;touch-action:none;border:1px solid var(--border)}
+.top-btn{position:absolute;bottom:24px;right:24px;width:42px;height:42px;border-radius:50%;background:var(--bg);color:var(--text-secondary);font-size:18px;font-weight:700;line-height:42px;text-align:center;cursor:pointer;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease,background .25s ease,color .25s ease;user-select:none;touch-action:none;border:1px solid var(--border)}
 .top-btn.show{opacity:1;pointer-events:auto}
 .top-btn:hover{transform:scale(1.1);background:var(--hover);color:var(--accent)}
 @media(max-width:768px){.top-btn{bottom:16px;right:16px;width:38px;height:38px;font-size:16px;line-height:38px}}
@@ -240,7 +240,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-header" id="sidebarHeader">
-    <h1>OctSeventh 的 Blog</h1>
+    <h1>孟冬初柒的博客</h1>
     <p>OctSeventh's Blog</p>
   </div>
   <input class="search-box" id="searchBox" type="text" placeholder="搜索文章..." oninput="filterTree(this.value)">
@@ -251,8 +251,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
   <div class="main-header">
     <button class="hamburger" id="hamburgerBtn">☰</button>
     <button class="sidebar-toggle" id="sidebarToggle" title="切换侧栏">⇐</button>
-    <span class="desktop-title" id="desktopTitle">OctSeventh 的 Blog</span>
-    <span id="mobileTitle" style="font-size:15px;font-weight:600;color:var(--text);display:none;">OctSeventh 的 Blog</span>
+    <span class="desktop-title" id="desktopTitle">OctSeventh's Blog</span>
+    <span id="mobileTitle" style="font-size:15px;font-weight:600;color:var(--text);display:none;">OctSeventh's Blog</span>
     <div class="header-actions">
       <button class="header-btn" id="themeToggle" title="切换深浅色模式">🌙</button>
       <button class="header-btn" id="menuBtn" title="菜单">⚙️</button>
@@ -260,7 +260,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
   </div>
   <!-- 文章目录导航（桌面端右侧空白处） -->
   <nav class="toc-nav" id="tocNav" style="display:none;">
-    <div class="toc-nav-title">📑 目录</div>
+    <div class="toc-nav-title">目录</div>
     <div id="tocNavLinks"></div>
   </nav>
   <div class="menu-dropdown" id="menuDropdown">
@@ -304,6 +304,51 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans
 </div>
 
 <script>
+// ─── Giscus 主题 ───
+function getGiscusTheme() {
+  return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+}
+function updateGiscusTheme(theme) {
+  var gFrame = document.querySelector('iframe.giscus-frame');
+  if (gFrame && gFrame.contentWindow) {
+    gFrame.contentWindow.postMessage({ giscus: { setConfig: { theme: theme } } }, 'https://giscus.app');
+  }
+  var gScript = document.getElementById('giscus-script');
+  if (gScript) {
+    gScript.setAttribute('data-theme', theme);
+  }
+}
+function renderMermaidIn(container) {
+  if (!window.mermaid || !container) return;
+  try {
+    mermaid.initialize({ startOnLoad: false, theme: (document.documentElement.getAttribute('data-theme')==='dark' ? 'dark' : 'default'), securityLevel: 'loose' });
+    var blocks = container.querySelectorAll('pre code.language-mermaid');
+    blocks.forEach(function(code, i){
+      var diagramText = code.textContent;
+      var div = document.createElement('div');
+      div.className = 'mermaid';
+      div.dataset.mermaidDiagram = diagramText;
+      div.textContent = diagramText;
+      var pre = code.closest('pre');
+      if (pre) pre.parentNode.replaceChild(div, pre);
+      else code.parentNode.replaceChild(div, code);
+      mermaid.render('mermaid' + Date.now() + '_' + i, diagramText).then(function(result){
+        div.innerHTML = result.svg;
+      }).catch(function(err){
+        div.innerHTML = '<p style="color:#f44336;">⚠️ Mermaid 渲染失败：' + err.message + '</p>';
+      });
+    });
+    var existing = container.querySelectorAll('div.mermaid[data-mermaid-diagram]');
+    existing.forEach(function(div, i){
+      var diagramText = div.dataset.mermaidDiagram;
+      mermaid.render('mermaid' + Date.now() + '_existing_' + i, diagramText).then(function(result){
+        div.innerHTML = result.svg;
+      }).catch(function(err){
+        div.innerHTML = '<p style="color:#f44336;">⚠️ Mermaid 渲染失败：' + err.message + '</p>';
+      });
+    });
+  } catch(e) {}
+}
 // ─── 深浅色模式 ───
 (function() {
   var s = localStorage.getItem('theme');
@@ -316,12 +361,8 @@ function toggleTheme() {
   if (isDark) { h.removeAttribute('data-theme'); localStorage.setItem('theme', 'light'); document.getElementById('themeToggle').textContent = '🌙'; }
   else { h.setAttribute('data-theme', 'dark'); localStorage.setItem('theme', 'dark'); document.getElementById('themeToggle').textContent = '☀️'; }
   updateBackground();
-  // 同步 Giscus 深浅色
-  var newTheme = isDark ? 'light' : 'dark';
-  var gFrame = document.querySelector('iframe.giscus-frame');
-  if (gFrame) {
-    gFrame.contentWindow.postMessage({ giscus: { setConfig: { theme: newTheme } } }, 'https://giscus.app');
-  }
+  updateGiscusTheme(getGiscusTheme());
+  renderMermaidIn(document.getElementById('markdownBody'));
 }
 document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 (function() { document.getElementById('themeToggle').textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙'; })();
@@ -529,15 +570,15 @@ function navigateTo(url) {
   var gFrame = document.querySelector('iframe.giscus-frame');
   if (gFrame) {
     gFrame.contentWindow.postMessage({
-      giscus: { setConfig: { term: window.location.pathname } }
+      giscus: { setConfig: { term: window.location.pathname, theme: getGiscusTheme() } }
     }, 'https://giscus.app');
   }
 
   // 更新标题
-  var label = 'OctSeventh 的 Blog';
+  var label = 'OctSeventh\'s Blog';
   if (fileKey !== 'content/index.md') {
     var n = fileKey.replace(/^content\//,'').replace(/\.md$/,'').replace(/\/index$/,'');
-    label = n + ' - OctSeventh 的 Blog';
+    label = n + ' - OctSeventh\'s Blog';
   }
   document.title = label;
 }
@@ -577,7 +618,7 @@ document.getElementById('treeWrapper').addEventListener('click', function(e){
 function getArticleUrl(filePath) {
   if (filePath === 'content/index.md') return '/';
   if (filePath.endsWith('/index.md')) {
-    return '/' + filePath.replace(/^content\//,'').replace(/\/index\.md$/,'/');
+    return '/' + filePath.replace(/^content\//,'').replace(/\/index\.md$/,'/') ;
   }
   return '/' + filePath.replace(/^content\//,'').replace(/\.md$/,'.html');
 }
@@ -757,24 +798,19 @@ window.addEventListener('resize', function(){
     requestAnimationFrame(function(){
       ticking=false;
       if (!tocLinkItems.length) return;
-      var scrollTop=cw.scrollTop, viewportHeight=cw.clientHeight;
+      var viewportHeight=cw.clientHeight;
       var current=null;
-      // 找到当前视口中最靠上的标题
+      var bestOffset=Infinity;
       for (var i=0;i<tocLinkItems.length;i++){
         var item=tocLinkItems[i];
         if (!item.target) continue;
         var rect=item.target.getBoundingClientRect();
-        if (rect.top <= 100 && rect.top + rect.height > 0) current=item;
-        else if (rect.top > 100) break;
-      }
-      // 如果没有任何标题位于视口上方区域，用最后一个在视口内的
-      if (!current) {
-        for (var j=0;j<tocLinkItems.length;j++){
-          var it=tocLinkItems[j];
-          if (!it.target) continue;
-          var r=it.target.getBoundingClientRect();
-          if (r.top < viewportHeight) current=it;
-          else break;
+        if (rect.bottom >= 0 && rect.top <= viewportHeight) {
+          var offset = rect.top >= 0 ? rect.top : 0;
+          if (offset < bestOffset) {
+            bestOffset = offset;
+            current = item;
+          }
         }
       }
       tocLinkItems.forEach(function(it){ it.el.classList.toggle('active', it === current); });
@@ -785,6 +821,8 @@ window.addEventListener('resize', function(){
 function loadFile(path,element){
   document.querySelectorAll('.tree-item-inner.active').forEach(function(el){el.classList.remove('active')});
   if(element)element.classList.add('active');
+  var wrapper=document.getElementById('contentWrapper');
+  if(wrapper) wrapper.scrollTop = 0;
   var mdText=contentMap[path];
   if(!mdText){document.getElementById('markdownBody').innerHTML='<p style="color:#d32f2f;">❌ 文章内容未找到</p>';return}
   // 所有页面默认使用视频背景，正文透明 + 遮罩
@@ -956,30 +994,7 @@ function loadFile(path,element){
   });
 
   // ─── Mermaid 流程图/时序图渲染 ───
-  // 支持 ```mermaid 代码块 → SVG 图表
-  if (window.mermaid) {
-    try {
-      mermaid.initialize({ startOnLoad: false, theme: (document.documentElement.getAttribute('data-theme')==='dark' ? 'dark' : 'default'), securityLevel: 'loose' });
-      (function renderMermaid(){
-        var blocks = mdBody.querySelectorAll('pre code.language-mermaid');
-        if (!blocks.length) return;
-        blocks.forEach(function(code, i){
-          var diagramText = code.textContent;
-          var div = document.createElement('div');
-          div.className = 'mermaid';
-          div.textContent = diagramText;
-          var pre = code.closest('pre');
-          if (pre) pre.parentNode.replaceChild(div, pre);
-          else code.parentNode.replaceChild(div, code);
-          mermaid.render('mermaid' + Date.now() + '_' + i, diagramText).then(function(result){
-            div.innerHTML = result.svg;
-          }).catch(function(err){
-            div.innerHTML = '<p style="color:#f44336;">⚠️ Mermaid 渲染失败：' + err.message + '</p>';
-          });
-        });
-      })();
-    } catch(e) {}
-  }
+  renderMermaidIn(mdBody);
 
   // ─── KaTeX 数学公式渲染 ───
   // 支持 $...$ 行内公式、$$...$$ 块级公式（Obsidian/LaTeX 风格）
@@ -1006,13 +1021,23 @@ function loadFile(path,element){
       sc.setAttribute('data-repo','RobertLau2480/Oct7-blog');sc.setAttribute('data-repo-id','R_kgDOTbOjlQ');sc.setAttribute('data-category','General');
       sc.setAttribute('data-category-id','DIC_kwDOTbOjlc4DDMMl');sc.setAttribute('data-mapping','pathname');sc.setAttribute('data-strict','0');
       sc.setAttribute('data-reactions-enabled','1');sc.setAttribute('data-emit-metadata','0');sc.setAttribute('data-input-position','bottom');
-      sc.setAttribute('data-theme','preferred_color_scheme');sc.setAttribute('data-lang','zh-CN');sc.setAttribute('crossorigin','anonymous');sc.async=true;
+      sc.setAttribute('data-theme', getGiscusTheme());sc.setAttribute('data-lang','zh-CN');sc.setAttribute('crossorigin','anonymous');sc.async=true;
       gc.appendChild(sc);
     }
   }
   // ─── 生成右侧文章目录导航 ───
   buildToc(path);
-  if(quotesData.length>0){var qe=mdBody.querySelector('.random-quote');if(qe&&qe.textContent.indexOf('正在加载')!==-1){var idx=Math.floor(Math.random()*quotesData.length);var q=quotesData[idx];qe.textContent='「 '+q.text+' 」'}}
+  if(quotesData.length>0){
+    var qe=mdBody.querySelector('.random-quote');
+    if(qe&&qe.textContent.indexOf('正在加载')!==-1){
+      var idx=Math.floor(Math.random()*quotesData.length);
+      var q=quotesData[idx];
+      qe.textContent='「 '+q.text+' 」';
+      if(q.source||q.author){
+        qe.textContent += ' — ' + (q.source||q.author);
+      }
+    }
+  }
   var label=element?element.querySelector('span:last-child').textContent:'';
   document.getElementById('desktopTitle').textContent='📝 '+(label||'个人博客');
   document.getElementById('mobileTitle').textContent=label||'个人博客';
@@ -1099,7 +1124,9 @@ function findFirstLeafFile(nodes){for(var i=0;i<nodes.length;i++){if(nodes[i].ty
     function onMove(e2){
       var dx=startX-e2.clientX,dy=startY-e2.clientY;
       if(Math.abs(dx)>5||Math.abs(dy)>5)isDragging=true;
-      var newRight=Math.max(8,Math.min(origX+dx,wrapper.clientWidth-btn.offsetWidth-8));
+      var tocNav=document.getElementById('tocNav');
+      var extraRight = (tocNav && tocNav.style.display !== 'none') ? tocNav.offsetWidth + 12 : 0;
+      var newRight=Math.max(8,Math.min(origX+dx,wrapper.clientWidth-btn.offsetWidth-8-extraRight));
       var newBottom=Math.max(8,Math.min(origY+dy,wrapper.clientHeight-btn.offsetHeight-8));
       btn.style.right=newRight+'px';btn.style.bottom=newBottom+'px';
     }
@@ -1115,7 +1142,9 @@ function findFirstLeafFile(nodes){for(var i=0;i<nodes.length;i++){if(nodes[i].ty
     function onMove(e2){e2.preventDefault();var t2=e2.touches[0];
       var dx=startX-t2.clientX,dy=startY-t2.clientY;
       if(Math.abs(dx)>5||Math.abs(dy)>5)isDragging=true;
-      var newRight=Math.max(8,Math.min(origX+dx,wrapper.clientWidth-btn.offsetWidth-8));
+      var tocNav=document.getElementById('tocNav');
+      var extraRight = (tocNav && tocNav.style.display !== 'none') ? tocNav.offsetWidth + 12 : 0;
+      var newRight=Math.max(8,Math.min(origX+dx,wrapper.clientWidth-btn.offsetWidth-8-extraRight));
       var newBottom=Math.max(8,Math.min(origY+dy,wrapper.clientHeight-btn.offsetHeight-8));
       btn.style.right=newRight+'px';btn.style.bottom=newBottom+'px';
     }

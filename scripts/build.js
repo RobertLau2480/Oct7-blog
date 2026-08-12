@@ -59,8 +59,8 @@ function scan(dirPath, relPath = '') {
       files[fileKey] = fs.readFileSync(fullPath, 'utf-8');
     }
   }
-  // 排序：个人博客首位，文件夹中间，关于/留言最后
-  const priority = { '个人博客.md': -2, '关于.md': 999, '留言.md': 999 };
+  // 排序：个人博客首位，文件夹中间，关于项目和留言最后
+  const priority = { '个人博客.md': -2, '关于.md': 999, '留言.md': 1000, '关于项目.md': 1001 };
   function rank(n) {
     const p = priority[n.name];
     if (p !== undefined) return p;        // 指定优先级
