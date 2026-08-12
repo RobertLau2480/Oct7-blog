@@ -21,6 +21,7 @@ function scan(dirPath, relPath = '') {
   const items = fs.readdirSync(dirPath, { withFileTypes: true });
   const tree = [];
   const files = {};
+  let hasIndexMd = false; // 当前目录下是否有 index.md
 
   for (const item of items) {
     if (item.name.startsWith('.') || item.name === 'images') continue;
@@ -29,14 +30,25 @@ function scan(dirPath, relPath = '') {
 
     if (item.isDirectory()) {
       const result = scan(fullPath, itemRel);
-      if (result.tree.length > 0) {
+      if (result.tree.length > 0 || result.hasIndexMd) {
         tree.push({ name: item.name, type: 'folder', children: result.tree });
         Object.assign(files, result.files);
       }
     } else if (item.name.endsWith('.md')) {
       const fileKey = `content/${itemRel}`;
-      // 不把 index.md 作为单独文件条目加入 tree（由文件夹代表）
-      if (item.name !== 'index.md') {
+      if (item.name === 'index.md') {
+        hasIndexMd = true;
+        // 根目录的 index.md 作为首页加入 tree
+        if (!relPath) {
+          tree.push({
+            name: item.name,
+            type: 'file',
+            path: fileKey,
+            label: '首页'
+          });
+        }
+        // 文件夹内的 index.md 由文件夹代表，不重复加入
+      } else {
         tree.push({
           name: item.name,
           type: 'file',
@@ -61,7 +73,7 @@ function scan(dirPath, relPath = '') {
     if (a.type !== b.type) return a.type === 'folder' ? 1 : -1;
     return a.name.localeCompare(b.name, 'zh-CN');
   });
-  return { tree, files };
+  return { tree, files, hasIndexMd };
 }
 
 // ─── 扫描 bgm ───

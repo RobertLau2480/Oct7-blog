@@ -569,8 +569,14 @@ function initApp() {
     var el = document.querySelector('[data-path="'+articlePath+'"]');
     loadFile(articlePath, el || null);
   } else {
-    var first = findFirstLeafFile(treeData);
-    if (first && contentMap[first.path]) { setTimeout(function(){ var el=document.querySelector('[data-path="'+first.path+'"]'); if(el)el.click(); }, 100); }
+    // 直接访问首页时，自动加载 content/index.md
+    if (contentMap['content/index.md']) {
+      var el = document.querySelector('[data-path="content/index.md"]');
+      loadFile('content/index.md', el || null);
+    } else {
+      var first = findFirstLeafFile(treeData);
+      if (first && contentMap[first.path]) { setTimeout(function(){ var el=document.querySelector('[data-path="'+first.path+'"]'); if(el)el.click(); }, 100); }
+    }
   }
 }
 
