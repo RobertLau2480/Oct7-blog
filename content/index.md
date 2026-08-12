@@ -1,6 +1,6 @@
 <div class="home-wrapper">
 <header class="home-header">
-<h1 class="site-title">OctSeventh 的 Blog <span style="font-size: 1.1rem"> OctSeventh's Blog</span></h1>
+<h1 class="site-title">孟冬初柒的博客 <span style="font-size: 1.1rem"> OctSeventh's Blog</span></h1>
 
 <i><p class="random-quote" id="random-quote">「 正在加载... 」</p></i>
 <span style="font-size: 0.1rem"><br></span>
@@ -8,10 +8,10 @@
 
 <section class="author-words">
 <p>
-欢迎来到 OctSeventh 的博客小站<br>
-这里记录着我的一些思考、学习笔记与生活碎片<br>
-所有功能都集中在左侧菜单栏中，若有任何问题或建议，欢迎随时留言联系<br>
-希望这个小站能带给你一些启发或片刻的宁静
+欢迎来到 Oct7 的博客<br>
+这里暂时不放东西。<br><br><i>
+这个项目源于一场重构，不过以维持原判结束。<br>
+本该被丢进垃圾堆，但我还是决定把它捡起来。<br></i>
 <br>
 <br>
 
@@ -19,36 +19,20 @@
 </section>
 
 <div class="card-grid">
+
 <a href="/目录1/index.html" class="glass-card">
 <div class="card-icon">📚</div>
 <div class="card-title">目录1</div>
-<div class="card-desc">记录学习、思考与日常的点滴</div>
+<div class="card-desc">description</div>
 <div class="card-preview">
-<div class="card-preview-item">💻 技术笔记</div>
-<div class="card-preview-item">🍃 随笔</div>
+<div class="card-preview-item">💻 text1</div>
+<div class="card-preview-item">🍃 text2</div>
 </div>
 </a>
 
-<a href="/" class="glass-card">
-<div class="card-icon">📖</div>
-<div class="card-title">网站简介</div>
-<div class="card-desc">关于我和这个安静的角落</div>
-<div class="card-preview">
-<div class="card-preview-item">一个记录我来过这世间的痕迹之地</div>
-</div>
-</a>
-
-<a href="https://octseven.us.kg/" class="glass-card">
-<div class="card-icon">💬</div>
-<div class="card-title">留言</div>
-<div class="card-desc">欢迎留下你的足迹</div>
-<div class="card-preview">
-<div class="card-preview-item">访问 OctSeventh 的网站</div>
-</div>
-</a>
 </div>
 
 <div class="friend-link">
-  OctSeventh 的网站：<a href="https://octseven.us.kg/">octseven.us.kg</a>
+  OctSeventh 的主站：<a href="https://octseven.us.kg/">octseven.us.kg</a>
 </div>
 </div>
