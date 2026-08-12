@@ -411,7 +411,42 @@ var handler=function(){var tm=Math.min(savedTime,aE.duration||savedTime);aE.curr
   updatePlayBtn();
 }
 function updatePlayBtn(){var b=document.getElementById('musicToggle'),c=b.querySelector('.btn-icon');if(!aE.paused&&!aE.ended){c.textContent='⏸';b.classList.add('playing')}else{c.textContent='▶️';b.classList.remove('playing')}}
-function togglePlay(){if(!pList.length)return;if(aE.paused){userPaused=false;localStorage.setItem('musicUserPaused','false');if(!aE.src){loadTrack(cT,true);return}aE.play().catch(function(){});updatePlayBtn()}else{userPaused=true;localStorage.setItem('musicUserPaused','true');aE.pause();updatePlayBtn()}}
+function togglePlay(){
+  if(!pList.length)return;
+  if(aE.paused){
+    userPaused=false;
+    localStorage.setItem('musicUserPaused','false');
+    if(!aE.src || !aE.currentSrc){
+      // 首次播放：直接设置 src 并播放，不走 loadTrack（避免 pause 干扰）
+      var s=pList[cT];
+      aE.src = '/' + s.file;
+      document.getElementById('musicTitle').textContent = s.name;
+      document.getElementById('musicToggle').classList.add('loading');
+      var savedTime = parseFloat(localStorage.getItem('musicTime_'+cT)||'0');
+      var h = aE._firstLoad;
+      if(h) aE.removeEventListener('loadedmetadata', h);
+      aE._firstLoad = function(){
+        aE.currentTime = Math.min(savedTime, aE.duration||savedTime);
+        aE.removeEventListener('loadedmetadata', aE._firstLoad);
+        aE._firstLoad = null;
+        document.getElementById('musicToggle').classList.remove('loading');
+      };
+      aE.addEventListener('loadedmetadata', aE._firstLoad);
+      var _pp = aE.play();
+      if(_pp) _pp.catch(function(){});
+      updatePlayBtn();
+      return;
+    }
+    var _p = aE.play();
+    if(_p) _p.catch(function(){});
+    updatePlayBtn();
+  }else{
+    userPaused=true;
+    localStorage.setItem('musicUserPaused','true');
+    aE.pause();
+    updatePlayBtn();
+  }
+}
 function nextTrack(){userPaused=false;localStorage.setItem('musicUserPaused','false');localStorage.removeItem('musicTime_'+cT);loadTrack(cT+1,true)}
 function prevTrack(){userPaused=false;localStorage.setItem('musicUserPaused','false');localStorage.removeItem('musicTime_'+cT);loadTrack(cT-1,true)}
 aE.addEventListener('timeupdate',function(){if(!aE.paused)localStorage.setItem('musicTime_'+cT,aE.currentTime)});
